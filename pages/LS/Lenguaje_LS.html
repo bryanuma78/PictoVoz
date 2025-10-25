@@ -79,37 +79,38 @@
     window.location.href = '/pages/Login/login.html';
   });
 
-  /* ===== TECLADO DE SEÑAS QWERTY ===== */
-  const filas = [
-    ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L'],
-    ['Z','X','C','V','B','N','M']
-  ];
+/* ===== TECLADO DE SEÑAS QWERTY ===== */
+const filas = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Z','X','C','V','B','N','M']
+];
 
-  const contenedorTeclado = document.querySelector('.contenedor-teclado');
-  const campoFrase = document.getElementById('campo-frase');
-  const btnVoz = document.getElementById('btn-voz');
-  const btnBorrar = document.getElementById('btn-borrar');
-  const btnEspacio = document.getElementById('btn-espacio');
+const contenedorTeclado = document.querySelector('.contenedor-teclado');
+const campoFrase = document.getElementById('campo-frase');
+const btnVoz = document.getElementById('btn-voz');
+const btnBorrar = document.getElementById('btn-borrar');
+const btnEspacio = document.getElementById('btn-espacio');
 
-  // Generar el teclado con filas tipo QWERTY
-  filas.forEach(fila => {
-    const filaDiv = document.createElement('div');
-    filaDiv.classList.add('fila-teclado');
-    fila.forEach(letra => {
-      const div = document.createElement('div');
-      div.classList.add('tecla');
-      div.innerHTML = `
-        <img src="/images/LS/${letra}.png" alt="${letra}" />
-        <span>${letra}</span>
-      `;
-      div.addEventListener('click', () => {
-        campoFrase.value += letra;
-      });
-      filaDiv.appendChild(div);
+// Generar el teclado con filas tipo QWERTY
+filas.forEach(fila => {
+  const filaDiv = document.createElement('div');
+  filaDiv.classList.add('fila-teclado');
+  fila.forEach(letra => {
+    const div = document.createElement('div');
+    div.classList.add('tecla');
+    div.innerHTML = `
+      <img src="/images/LS/${letra}.jpg" alt="${letra}" />
+      <span>${letra}</span>
+    `;
+    div.addEventListener('click', () => {
+      campoFrase.value += letra;
     });
-    contenedorTeclado.appendChild(filaDiv);
+    filaDiv.appendChild(div);
   });
+  contenedorTeclado.appendChild(filaDiv);
+});
+
 
   // 🔊 Reproducir con voz
   btnVoz.addEventListener('click', () => {
