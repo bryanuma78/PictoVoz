@@ -16,7 +16,8 @@
 
       // Enviar correo de restablecimiento
       const { error } = await supabase.auth.resetPasswordForEmail(correo, {
-        redirectTo: window.location.origin + "/pages/Login/nueva_contraseña.html"
+        redirectTo: "https://pictovoz.netlify.app/pages/Login/nueva_contraseña.html"
+
       });
 
       if (error) {
