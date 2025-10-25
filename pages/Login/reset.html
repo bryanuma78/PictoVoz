@@ -1,71 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recuperar Contraseña | PictoVoz</title>
-  <link rel="stylesheet" href="/css/index/index.css">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restablecer Contraseña | PictoVoz</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
   <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const form = document.getElementById("resetForm");
+    const form = document.getElementById("resetForm");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const correo = form.correo.value.trim();
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = form.correo.value.trim();
 
-        const { error } = await supabase.auth.resetPasswordForEmail(correo, {
-          redirectTo: window.location.origin + "/pages/Login/update-password.html"
-        });
-
-        if (error) {
-          alert("⚠️ " + error.message);
-        } else {
-          alert("📩 Se ha enviado un enlace de recuperación a tu correo.");
-        }
+      // Enviar correo de restablecimiento
+      const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+        redirectTo: window.location.origin + "/pages/Login/nueva_contraseña.html"
       });
+
+      if (error) {
+        alert("⚠️ Error: " + error.message);
+      } else {
+        alert("📧 Revisa tu correo para continuar con el restablecimiento.");
+        form.reset();
+      }
     });
   </script>
 </head>
 
 <body>
-
-  <!-- ===== NAVBAR ===== -->
   <nav class="navbar">
     <div class="nav-logo">
       <img src="/images/pictovoz.png" alt="Logo PictoVoz">
       <span>PictoVoz</span>
     </div>
-
-    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
-
     <div class="nav-links">
       <a href="/index.html">Inicio</a>
       <a href="/pages/Login/login.html">Iniciar Sesión</a>
-      <a href="/pages/Login/register.html">Registrarse</a>
-      <a href="#">Ayuda</a>
     </div>
   </nav>
 
-  <!-- ===== FORMULARIO RECUPERAR ===== -->
   <main class="login-container">
     <h2>Recuperar Contraseña</h2>
     <form id="resetForm">
-      <input type="email" name="correo" placeholder="Correo electrónico" required>
+      <input type="email" name="correo" placeholder="Ingresa tu correo" required />
       <button type="submit">Enviar enlace</button>
     </form>
     <p><a href="/pages/Login/login.html">Volver al inicio de sesión</a></p>
   </main>
-
-  <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    toggle.addEventListener('click', () => {
-      navLinks.classList.toggle('nav-open');
-    });
-  </script>
-
 </body>
 </html>

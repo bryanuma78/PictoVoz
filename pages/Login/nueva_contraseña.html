@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nueva Contraseña | PictoVoz</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const form = document.getElementById("newPassForm");
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nueva = form.nueva.value.trim();
+
+      const { data, error } = await supabase.auth.updateUser({
+        password: nueva
+      });
+
+      if (error) {
+        alert("⚠️ Error: " + error.message);
+      } else {
+        alert("✅ Contraseña actualizada correctamente. Inicia sesión nuevamente.");
+        window.location.href = "/pages/Login/login.html";
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+  </nav>
+
+  <main class="login-container">
+    <h2>Establecer nueva contraseña</h2>
+    <form id="newPassForm">
+      <input type="password" name="nueva" placeholder="Nueva contraseña" required />
+      <button type="submit">Actualizar contraseña</button>
+    </form>
+  </main>
+</body>
+</html>
