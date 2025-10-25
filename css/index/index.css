@@ -377,3 +377,86 @@ p a:hover {
     padding: 1.5rem;
   }
 }
+
+
+
+
+
+#seleccion-teclado {
+  background-color: #fef9f0;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+#seleccion-teclado h2 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+#seleccion-teclado p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #374151;
+}
+
+.teclado-opciones {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.opcion {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  width: 180px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.opcion img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+.opcion span {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.opcion:hover {
+  transform: scale(1.05);
+  background-color: #e0f2fe;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#bienvenida {
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+}
+
+#cerrar-sesion-btn {
+  background-color: #ffffff;
+  color: #4aa658;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#cerrar-sesion-btn:hover {
+  background-color: #e9f8eb;
+  transform: scale(1.05);
+}

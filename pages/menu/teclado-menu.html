@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PictoVoz - Elige Teclado</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+
+    <div class="nav-links">
+      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
+      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <!-- ===== SELECCIÓN DE TECLADO ===== -->
+  <section id="seleccion-teclado">
+    <h2>Elige tu teclado 🖐️🧩</h2>
+    <p>Selecciona cómo quieres comunicarte:</p>
+    <div class="teclado-opciones">
+      <div class="opcion" onclick="window.location.href='./pages/TecladoLS/ls.html'">
+        <img src="/images/ls-icon.png" alt="Teclado Lengua de Señas">
+        <span>Teclado LS</span>
+      </div>
+      <div class="opcion" onclick="window.location.href='./pages/TecladoPictogramas/picto.html'">
+        <img src="/images/picto-icon.png" alt="Teclado Pictogramas">
+        <span>Teclado Pictogramas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCRIPT MENÚ RESPONSIVO Y SUPABASE ===== -->
+  <script>
+    // Inicializa Supabase
+    const supabaseUrl = 'TU_SUPABASE_URL';
+    const supabaseKey = 'TU_SUPABASE_ANON_KEY';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+    const bienvenida = document.getElementById('bienvenida');
+    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+
+    // Mostrar usuario
+    async function mostrarUsuario() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if(user) {
+        bienvenida.textContent = `Bienvenido, ${user.user_metadata.full_name || user.email}`;
+      } else {
+        // Redirige al login si no hay usuario
+        window.location.href = './pages/Login/login.html';
+      }
+    }
+
+    mostrarUsuario();
+
+    // Cerrar sesión
+    cerrarBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = './pages/Login/login.html';
+    });
+
+    // Menú responsivo
+    const toggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('nav-open');
+    });
+  </script>
+
+</body>
+</html>

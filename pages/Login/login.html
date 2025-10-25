@@ -7,27 +7,31 @@
   <link rel="stylesheet" href="/css/index/index.css">
   <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
-
+  
     const form = document.getElementById("loginForm");
-
+  
     form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const correo = form.correo.value;
       const contraseña = form.contraseña.value;
-
+  
       const { data, error } = await supabase.rpc("login_user", {
         p_correo: correo,
         p_contraseña: contraseña,
       });
-
+  
       if (error) {
         alert("⚠️ " + error.message);
       } else {
         alert("✅ Bienvenido!");
         console.log("Usuario logeado con ID:", data);
+  
+        // Redirige a la página del menú de teclados
+        window.location.href = "/pages/Teclado/teclado-menu.html";
       }
     });
   </script>
+  
 </head>
 <body>
 
