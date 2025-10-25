@@ -15,9 +15,11 @@
       <span>PictoVoz</span>
     </div>
 
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+    
     <div class="nav-links">
-      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
-      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+      <span id="bienvenido" style="color:white; margin-right:1rem;"></span>
+      <button class="login-btn" onclick="window.location.href='/pages/Login/login.html'">Cerrar Sesion</button>
     </div>
   </nav>
 
@@ -36,7 +38,7 @@
       </div>
     </div>
   </section>
-  
+
   <script type="module">
     import { supabase } from './pages/Login/supabase.js'; // ajusta la ruta si es necesario
   
