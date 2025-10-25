@@ -56,7 +56,7 @@
       if (user) {
         bienvenida.textContent = `Bienvenido, ${user.user_metadata?.full_name || user.email}`;
       } else {
-        window.location.href = './pages/Login/login.html';
+        window.location.href = '/pages/Login/login.html';
       }
     }
   
@@ -65,7 +65,7 @@
     // Cerrar sesión
     cerrarBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
-      window.location.href = './pages/Login/login.html';
+      window.location.href = '/pages/Login/login.html';
     });
  
 
