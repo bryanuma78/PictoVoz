@@ -1,0 +1,379 @@
+
+/* ===== RESETEO Y FUENTE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  color: #222;
+  scroll-behavior: smooth;
+}
+
+/* ===== NAVBAR PICTOVOZ ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #5DBB63; /* Verde accesible */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  z-index: 1000;
+}
+
+/* ===== LOGO ===== */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.nav-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* ===== ENLACES ===== */
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links a {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ===== BOTÓN LOGIN ===== */
+.login-btn {
+  background-color: white;
+  color: #4aa658;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #e9f8eb;
+  transform: scale(1.05);
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  nav {
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== AJUSTE DE CONTENIDO ===== */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  padding-top: 100px; /* Evita que el contenido se oculte tras el navbar */
+  text-align: center;
+}
+
+
+/* ===== SECCIONES ===== */
+section {
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+#inicio {
+  background-color: #e0f2fe;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding-top: 8rem;
+}
+
+#inicio h1 {
+  font-size: 2.5rem;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
+
+#inicio p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+/* ===== NOSOTROS ===== */
+#nosotros {
+  background-color: #f0f9ff;
+}
+
+#nosotros h2 {
+  font-size: 2rem;
+  color: #1d4ed8;
+  margin-bottom: 1rem;
+}
+
+#nosotros p {
+  max-width: 700px;
+  margin: auto;
+  font-size: 1.1rem;
+  color: #374151;
+}
+
+/* ===== GALERÍA ===== */
+#galeria {
+  background-color: #fff;
+}
+
+#galeria h2 {
+  font-size: 2rem;
+  color: #1e40af;
+  margin-bottom: 1rem;
+}
+
+.collage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.collage img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.collage img:hover {
+  transform: scale(1.05);
+}
+
+/* ===== CONTACTO ===== */
+#contacto {
+  background-color: #f0fdf4;
+}
+
+#contacto h2 {
+  font-size: 2rem;
+  color: #166534;
+  margin-bottom: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 400px;
+  margin: auto;
+}
+
+input, textarea {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 0.8rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #059669;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background-color: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  nav {
+    flex-wrap: wrap;
+  }
+
+  #inicio h1 {
+    font-size: 2rem;
+  }
+
+  .collage img {
+    width: 150px;
+    height: 150px;
+  }
+}
+.nav-logo {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+font-size: 1.5rem;
+font-weight: 700;
+color: #f0f0f0;
+}
+
+.nav-logo img {
+width: 45px;     /* ajusta el tamaño según tu imagen */
+height: 45px;
+border-radius: 50%;  /* opcional: hace el logo redondo */
+}
+/* ===== MENÚ RESPONSIVO ===== */
+.nav-toggle {
+  display: none;
+  font-size: 1.5rem;
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    background-color: #5DBB63;
+    flex-direction: column;
+    width: 200px;
+    padding: 1rem;
+    border-bottom-left-radius: 20px;
+    display: none;
+  }
+
+  .nav-links.nav-open {
+    display: flex;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+}
+/* ===== FORMULARIOS MINIMALISTAS ===== */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.login-container h2 {
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.login-container h3 {
+  color: #059669;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+input, textarea, button {
+  font-size: 1rem;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  border-color: #5DBB63;
+  box-shadow: 0 0 6px rgba(92,184,92,0.4);
+}
+
+button {
+  background-color: #5DBB63;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  border: none;
+}
+
+button:hover {
+  background-color: #4aa658;
+  transform: scale(1.05);
+}
+
+p a {
+  color: #1e3a8a;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  form {
+    padding: 1.5rem;
+  }
+}
