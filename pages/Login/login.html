@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión | PictoVoz</title>
+  <link rel="stylesheet" href="/css/index/index.css">
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const form = document.getElementById("loginForm");
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = form.correo.value;
+      const contraseña = form.contraseña.value;
+
+      const { data, error } = await supabase.rpc("login_user", {
+        p_correo: correo,
+        p_contraseña: contraseña,
+      });
+
+      if (error) {
+        alert("⚠️ " + error.message);
+      } else {
+        alert("✅ Bienvenido!");
+        console.log("Usuario logeado con ID:", data);
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+
+    <div class="nav-links">
+      <a href="/index.html">Inicio</a>
+      <a href="/pages/Login/register.html">Registrarse</a>
+      <a href="/pages/Login/reset.html">Recuperar</a>
+      <a href="#">Ayuda</a>
+    </div>
+  </nav>
+
+  <!-- ===== FORMULARIO LOGIN ===== -->
+  <main class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+      <input type="email" name="correo" placeholder="Correo" required>
+      <input type="password" name="contraseña" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+    </form>
+    <p><a href="/pages/Login/register.html">Crear cuenta</a></p>
+    <p><a href="/pages/Login/reset.html">¿Olvidaste tu contraseña?</a></p>
+  </main>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('nav-open');
+    });
+  </script>
+</body>
+</html>

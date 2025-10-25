@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teclado con Pictogramas para Niños con Discapacidad Motriz</title>
+    <link rel="stylesheet" href="./css/teclado.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+
+    <!-- Encabezado -->
+    <div class="header">
+        <button onclick="cerrarSesion()">Cerrar sesión</button>
+        <div class="user-info">
+            <img src="perfil-animales.jpg" alt="Perfil" class="perfil-img">
+            <span id="usuario">Usuario: Juanito</span>
+        </div>
+    </div>
+
+    <!-- Sección de contenido con pictogramas -->
+    <div class="teclado-container">
+        <div class="pictogramas">
+            <button class="pictograma" onclick="hablar('Quiero ir al baño')">
+                <img src="baño.png" alt="Quiero ir al baño">
+                <span>Quiero ir al baño</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero comer')">
+                <img src="comer.png" alt="Quiero comer">
+                <span>Quiero comer</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero jugar')">
+                <img src="jugar.png" alt="Quiero jugar">
+                <span>Quiero jugar</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero salir al parque')">
+                <img src="parque.png" alt="Quiero salir al parque">
+                <span>Quiero salir al parque</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero tomar agua')">
+                <img src="agua.png" alt="Quiero tomar agua">
+                <span>Quiero tomar agua</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero ducharme')">
+                <img src="ducharme.png" alt="Quiero ducharme">
+                <span>Quiero ducharme</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Tengo hambre')">
+                <img src="hambre.png" alt="Tengo hambre">
+                <span>Tengo hambre</span>
+            </button>
+            <button class="pictograma" onclick="hablar('Quiero dormir')">
+                <img src="dormir.png" alt="Quiero dormir">
+                <span>Quiero dormir</span>
+            </button>
+        </div>
+
+        <!-- Formulario para agregar pictogramas personalizados -->
+        <div class="agregar-pictograma">
+            <h3>Agregar un pictograma personalizado</h3>
+            <input type="text" id="textoPictograma" placeholder="Escribe lo que quieres decir...">
+            <input type="file" id="imagenPictograma" accept="image/*">
+            <button onclick="agregarPictograma()">Agregar Pictograma</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para generar la voz del asistente virtual
+        function hablar(texto) {
+            const speech = new SpeechSynthesisUtterance(texto);
+            speech.lang = 'es-ES'; // Configura el idioma de la voz
+            window.speechSynthesis.speak(speech);
+        }
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            window.location.href = 'login.html'; // Redirige a la página de inicio de sesión
+        }
+
+        // Función para agregar pictograma personalizado
+        function agregarPictograma() {
+            const texto = document.getElementById('textoPictograma').value;
+            const archivo = document.getElementById('imagenPictograma').files[0];
+
+            if (texto && archivo) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagenURL = e.target.result;
+
+                    // Crear un nuevo botón con el pictograma
+                    const pictogramaContainer = document.createElement('div');
+                    pictogramaContainer.classList.add('pictograma');
+                    const imagen = document.createElement('img');
+                    imagen.src = imagenURL;
+                    const textoPictograma = document.createElement('span');
+                    textoPictograma.innerText = texto;
+                    pictogramaContainer.appendChild(imagen);
+                    pictogramaContainer.appendChild(textoPictograma);
+
+                    // Agregar el nuevo pictograma a la interfaz
+                    pictogramaContainer.onclick = function() {
+                        hablar(texto); // Reproducir el texto cuando se hace clic
+                    };
+                    document.querySelector('.pictogramas').appendChild(pictogramaContainer);
+                };
+                reader.readAsDataURL(archivo); // Leer la imagen seleccionada
+            } else {
+                alert('Por favor, ingresa texto y selecciona una imagen.');
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos básicos */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #ff6347;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .perfil-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .teclado-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pictograma {
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #ff6347;
+            border-radius: 10px;
+            text-align: center;
+            background-color: #ffefd5;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+        }
+
+        .pictograma img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .pictograma:hover {
+            background-color: #ff6347;
+            color: white;
+        }
+
+        .agregar-pictograma {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .agregar-pictograma input {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .agregar-pictograma button {
+            padding: 10px 20px;
+            background-color: #32cd32;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .agregar-pictograma button:hover {
+            background-color: #228b22;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar contraseña | PictoVoz</title>
+  <link rel="stylesheet" href="/css/index/index.css">
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const form = document.getElementById("resetForm");
+    const newForm = document.getElementById("newPassForm");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = form.correo.value;
+
+      const { data, error } = await supabase.rpc("generate_reset_token", {
+        p_correo: correo,
+      });
+
+      if (error) {
+        alert("⚠️ " + error.message);
+      } else {
+        alert("✅ Token generado (ver consola)");
+        console.log("Token:", data);
+      }
+    });
+
+    newForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const token = newForm.token.value;
+      const nueva = newForm.nueva.value;
+
+      const { data, error } = await supabase.rpc("reset_password", {
+        p_token: token,
+        p_new_password: nueva,
+      });
+
+      if (error) {
+        alert("⚠️ " + error.message);
+      } else {
+        alert("✅ Contraseña actualizada!");
+        window.location.href = "/pages/Login/login.html";
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+
+    <div class="nav-links">
+      <a href="/index.html">Inicio</a>
+      <a href="/pages/Login/login.html">Iniciar sesión</a>
+      <a href="/pages/Login/register.html">Registrarse</a>
+      <a href="#">Ayuda</a>
+    </div>
+  </nav>
+
+  <!-- ===== FORMULARIO RESTABLECER ===== -->
+  <main class="login-container">
+    <h2>Recuperar contraseña</h2>
+    <form id="resetForm">
+      <input type="email" name="correo" placeholder="Tu correo" required>
+      <button type="submit">Generar enlace</button>
+    </form>
+
+    <h3>Actualizar contraseña (usando token)</h3>
+    <form id="newPassForm">
+      <input type="text" name="token" placeholder="Token recibido" required>
+      <input type="password" name="nueva" placeholder="Nueva contraseña" required>
+      <button type="submit">Actualizar</button>
+    </form>
+
+    <p><a href="/pages/Login/login.html">Regresar</a></p>
+  </main>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('nav-open');
+    });
+  </script>
+</body>
+</html>
