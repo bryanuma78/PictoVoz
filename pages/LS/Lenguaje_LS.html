@@ -45,51 +45,58 @@
     <button id="btn-borrar" class="btn-borrar">Borrar</button>
   </section>
 
-  <!-- ===== SCRIPT ===== -->
   <script type="module">
-    import { supabase } from '/pages/Login/supabase.js';
+  import { supabase } from '/pages/Login/supabase.js';
 
-    const bienvenida = document.getElementById('bienvenida');
-    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+  const bienvenida = document.getElementById('bienvenida');
+  const cerrarBtn = document.getElementById('cerrar-sesion-btn');
 
-    async function mostrarUsuario() {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        const user = data?.user;
-        if (user) {
-          const nombre = user.user_metadata?.full_name ?? user.email;
-          bienvenida.textContent = `Bienvenido, ${nombre}`;
-        } else {
-          window.location.href = '/pages/Login/login.html';
-        }
-      } catch (err) {
-        console.error('Error al obtener usuario:', err.message);
+  async function mostrarUsuario() {
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      const user = data?.user;
+      if (user) {
+        const nombre = user.user_metadata?.full_name ?? user.email;
+        bienvenida.textContent = `Bienvenido, ${nombre}`;
+      } else {
         window.location.href = '/pages/Login/login.html';
       }
-    }
-    mostrarUsuario();
-
-    cerrarBtn.addEventListener('click', async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error al cerrar sesión:', error.message);
-        alert('No se pudo cerrar la sesión.');
-        return;
-      }
+    } catch (err) {
+      console.error('Error al obtener usuario:', err.message);
       window.location.href = '/pages/Login/login.html';
-    });
+    }
+  }
+  mostrarUsuario();
 
-    /* ===== TECLADO DE SEÑAS ===== */
-    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const contenedorTeclado = document.querySelector('.contenedor-teclado');
-    const campoFrase = document.getElementById('campo-frase');
-    const btnVoz = document.getElementById('btn-voz');
-    const btnBorrar = document.getElementById('btn-borrar');
-    const btnEspacio = document.getElementById('btn-espacio');
+  cerrarBtn.addEventListener('click', async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error al cerrar sesión:', error.message);
+      alert('No se pudo cerrar la sesión.');
+      return;
+    }
+    window.location.href = '/pages/Login/login.html';
+  });
 
-    // Generar el teclado automáticamente
-    letras.forEach(letra => {
+  /* ===== TECLADO DE SEÑAS QWERTY ===== */
+  const filas = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['Z','X','C','V','B','N','M']
+  ];
+
+  const contenedorTeclado = document.querySelector('.contenedor-teclado');
+  const campoFrase = document.getElementById('campo-frase');
+  const btnVoz = document.getElementById('btn-voz');
+  const btnBorrar = document.getElementById('btn-borrar');
+  const btnEspacio = document.getElementById('btn-espacio');
+
+  // Generar el teclado con filas tipo QWERTY
+  filas.forEach(fila => {
+    const filaDiv = document.createElement('div');
+    filaDiv.classList.add('fila-teclado');
+    fila.forEach(letra => {
       const div = document.createElement('div');
       div.classList.add('tecla');
       div.innerHTML = `
@@ -99,28 +106,31 @@
       div.addEventListener('click', () => {
         campoFrase.value += letra;
       });
-      contenedorTeclado.appendChild(div);
+      filaDiv.appendChild(div);
     });
+    contenedorTeclado.appendChild(filaDiv);
+  });
 
-    // 🔊 Reproducir con voz (Text-to-Speech)
-    btnVoz.addEventListener('click', () => {
-      const texto = campoFrase.value.trim();
-      if (!texto) return;
-      const speech = new SpeechSynthesisUtterance(texto);
-      speech.lang = 'es-ES';
-      speech.rate = 1;
-      window.speechSynthesis.speak(speech);
-    });
+  // 🔊 Reproducir con voz
+  btnVoz.addEventListener('click', () => {
+    const texto = campoFrase.value.trim();
+    if (!texto) return;
+    const speech = new SpeechSynthesisUtterance(texto);
+    speech.lang = 'es-ES';
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
+  });
 
-    // 🔤 Espacio
-    btnEspacio.addEventListener('click', () => {
-      campoFrase.value += ' ';
-    });
+  // 🟦 Espacio
+  btnEspacio.addEventListener('click', () => {
+    campoFrase.value += ' ';
+  });
 
-    // 🗑️ Borrar texto
-    btnBorrar.addEventListener('click', () => {
-      campoFrase.value = '';
-    });
-  </script>
+  // 🗑️ Borrar texto completo
+  btnBorrar.addEventListener('click', () => {
+    campoFrase.value = '';
+  });
+</script>
+
 </body>
 </html>
