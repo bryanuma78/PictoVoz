@@ -3,49 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recuperar contraseña | PictoVoz</title>
+  <title>Recuperar Contraseña | PictoVoz</title>
   <link rel="stylesheet" href="/css/index/index.css">
+
   <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
 
-    const form = document.getElementById("resetForm");
-    const newForm = document.getElementById("newPassForm");
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("resetForm");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const correo = form.correo.value;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const correo = form.correo.value.trim();
 
-      const { data, error } = await supabase.rpc("generate_reset_token", {
-        p_correo: correo,
+        const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+          redirectTo: window.location.origin + "/pages/Login/update-password.html"
+        });
+
+        if (error) {
+          alert("⚠️ " + error.message);
+        } else {
+          alert("📩 Se ha enviado un enlace de recuperación a tu correo.");
+        }
       });
-
-      if (error) {
-        alert("⚠️ " + error.message);
-      } else {
-        alert("✅ Token generado (ver consola)");
-        console.log("Token:", data);
-      }
-    });
-
-    newForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const token = newForm.token.value;
-      const nueva = newForm.nueva.value;
-
-      const { data, error } = await supabase.rpc("reset_password", {
-        p_token: token,
-        p_new_password: nueva,
-      });
-
-      if (error) {
-        alert("⚠️ " + error.message);
-      } else {
-        alert("✅ Contraseña actualizada!");
-        window.location.href = "/pages/Login/login.html";
-      }
     });
   </script>
 </head>
+
 <body>
 
   <!-- ===== NAVBAR ===== -->
@@ -59,28 +43,20 @@
 
     <div class="nav-links">
       <a href="/index.html">Inicio</a>
-      <a href="/pages/Login/login.html">Iniciar sesión</a>
+      <a href="/pages/Login/login.html">Iniciar Sesión</a>
       <a href="/pages/Login/register.html">Registrarse</a>
       <a href="#">Ayuda</a>
     </div>
   </nav>
 
-  <!-- ===== FORMULARIO RESTABLECER ===== -->
+  <!-- ===== FORMULARIO RECUPERAR ===== -->
   <main class="login-container">
-    <h2>Recuperar contraseña</h2>
+    <h2>Recuperar Contraseña</h2>
     <form id="resetForm">
-      <input type="email" name="correo" placeholder="Tu correo" required>
-      <button type="submit">Generar enlace</button>
+      <input type="email" name="correo" placeholder="Correo electrónico" required>
+      <button type="submit">Enviar enlace</button>
     </form>
-
-    <h3>Actualizar contraseña (usando token)</h3>
-    <form id="newPassForm">
-      <input type="text" name="token" placeholder="Token recibido" required>
-      <input type="password" name="nueva" placeholder="Nueva contraseña" required>
-      <button type="submit">Actualizar</button>
-    </form>
-
-    <p><a href="/pages/Login/login.html">Regresar</a></p>
+    <p><a href="/pages/Login/login.html">Volver al inicio de sesión</a></p>
   </main>
 
   <script>
@@ -90,5 +66,6 @@
       navLinks.classList.toggle('nav-open');
     });
   </script>
+
 </body>
 </html>

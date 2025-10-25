@@ -5,32 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registrarse | PictoVoz</title>
   <link rel="stylesheet" href="/css/index/index.css">
+
   <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
 
-    const form = document.getElementById("registerForm");
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("registerForm");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const nombre = form.nombre.value;
-      const correo = form.correo.value;
-      const contraseña = form.contraseña.value;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const nombre = form.nombre.value.trim();
+        const correo = form.correo.value.trim();
+        const contraseña = form.contraseña.value;
 
-      const { data, error } = await supabase.rpc("register_user", {
-        p_nombre: nombre,
-        p_correo: correo,
-        p_contraseña: contraseña,
+        const { data, error } = await supabase.auth.signUp({
+          email: correo,
+          password: contraseña,
+          options: {
+            data: { full_name: nombre },
+          },
+        });
+
+        if (error) {
+          alert("⚠️ " + error.message);
+        } else {
+          alert("✅ Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta.");
+          window.location.href = "/pages/Login/login.html";
+        }
       });
-
-      if (error) {
-        alert("⚠️ " + error.message);
-      } else {
-        alert("✅ Usuario creado correctamente!");
-        window.location.href = "/pages/Login/login.html";
-      }
     });
   </script>
 </head>
+
 <body>
 
   <!-- ===== NAVBAR ===== -->
@@ -44,7 +50,7 @@
 
     <div class="nav-links">
       <a href="/index.html">Inicio</a>
-      <a href="/pages/Login/login.html">Iniciar sesión</a>
+      <a href="/pages/Login/login.html">Iniciar Sesión</a>
       <a href="/pages/Login/reset.html">Recuperar</a>
       <a href="#">Ayuda</a>
     </div>
@@ -52,14 +58,14 @@
 
   <!-- ===== FORMULARIO REGISTRO ===== -->
   <main class="login-container">
-    <h2>Crear cuenta</h2>
+    <h2>Crear Cuenta</h2>
     <form id="registerForm">
-      <input type="text" name="nombre" placeholder="Nombre" required>
-      <input type="email" name="correo" placeholder="Correo" required>
+      <input type="text" name="nombre" placeholder="Nombre completo" required>
+      <input type="email" name="correo" placeholder="Correo electrónico" required>
       <input type="password" name="contraseña" placeholder="Contraseña" required>
       <button type="submit">Registrarse</button>
     </form>
-    <p><a href="/pages/Login/login.html">Ya tengo cuenta</a></p>
+    <p><a href="/pages/Login/login.html">¿Ya tienes cuenta? Inicia sesión</a></p>
   </main>
 
   <script>
@@ -69,5 +75,6 @@
       navLinks.classList.toggle('nav-open');
     });
   </script>
+
 </body>
 </html>
