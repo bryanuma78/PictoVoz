@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PictoVoz - Elige Teclado</title>
   <link rel="stylesheet" href="/css/index/index.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -38,43 +37,32 @@
     </div>
   </section>
 
-  <!-- ===== SCRIPT MENÚ RESPONSIVO Y SUPABASE ===== -->
-  <script>
-    // Inicializa Supabase
-    const supabaseUrl = 'https://kicxfzxzubvpivzwlfsy.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpY3hmenh6dWJ2cGl2endsZnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMzg2NjcsImV4cCI6MjA3NjkxNDY2N30.UGpuS698M8OhN5tMWEDFHjXtcuj6LiyL_pOYv_N8z5I';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-  
+  <!-- ===== SCRIPT DE LÓGICA ===== -->
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
     const bienvenida = document.getElementById('bienvenida');
     const cerrarBtn = document.getElementById('cerrar-sesion-btn');
-  
+
     // Mostrar usuario actual
     async function mostrarUsuario() {
       const { data, error } = await supabase.auth.getUser();
       const user = data?.user;
-  
+
       if (user) {
         bienvenida.textContent = `Bienvenido, ${user.user_metadata?.full_name || user.email}`;
       } else {
-        window.location.href = '/pages/Login/login.html';
+        // Redirige al login si no hay usuario
+        window.location.href = './pages/Login/login.html';
       }
     }
-  
+
     mostrarUsuario();
-  
+
     // Cerrar sesión
     cerrarBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
-      window.location.href = '/pages/Login/login.html';
-    });
- 
-
-    // Menú responsivo
-    const toggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-
-    toggle.addEventListener('click', () => {
-      navLinks.classList.toggle('nav-open');
+      window.location.href = './pages/Login/login.html';
     });
   </script>
 
