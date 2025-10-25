@@ -39,27 +39,25 @@
 
   <!-- ===== SCRIPT DE LÓGICA ===== -->
   <script type="module">
-    import { supabase } from '/pages/Login/supabase.js';
+    import { supabase } from './pages/Login/supabase.js'; // 👈 ajusta la ruta si es necesario
 
     const bienvenida = document.getElementById('bienvenida');
     const cerrarBtn = document.getElementById('cerrar-sesion-btn');
 
-    // Mostrar usuario actual
     async function mostrarUsuario() {
       const { data, error } = await supabase.auth.getUser();
       const user = data?.user;
 
       if (user) {
-        bienvenida.textContent = `Bienvenido, ${user.user_metadata?.full_name || user.email}`;
+        const nombre = user.user_metadata?.full_name ?? user.email;
+        bienvenida.textContent = `Bienvenido, ${nombre}`;
       } else {
-        // Redirige al login si no hay usuario
         window.location.href = './pages/Login/login.html';
       }
     }
 
     mostrarUsuario();
 
-    // Cerrar sesión
     cerrarBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
       window.location.href = './pages/Login/login.html';
