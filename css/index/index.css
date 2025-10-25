@@ -460,3 +460,165 @@ p a:hover {
   background-color: #e9f8eb;
   transform: scale(1.05);
 }
+
+
+/* ===== RESETEO ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9fafb;
+  color: #222;
+  padding-top: 100px;
+  text-align: center;
+}
+
+/* ===== SECCIÓN PRINCIPAL ===== */
+#teclado-ls {
+  background-color: #fef9f0;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+#teclado-ls h2 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+#teclado-ls p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #374151;
+}
+
+/* ===== BARRA DE TEXTO ===== */
+.barra-texto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.barra-texto input {
+  width: 60%;
+  max-width: 500px;
+  padding: 0.8rem;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  border: 2px solid #5DBB63;
+  background-color: white;
+  text-align: center;
+}
+
+#btn-voz {
+  background-color: #5DBB63;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+#btn-voz:hover {
+  transform: scale(1.1);
+  background-color: #4aa658;
+}
+
+/* ===== TECLADO ===== */
+.contenedor-teclado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  justify-content: center;
+  padding: 1rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+.tecla {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.tecla:hover {
+  transform: scale(1.05);
+  background-color: #e0f2fe;
+}
+
+.tecla img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.tecla span {
+  display: block;
+  font-weight: 600;
+  color: #1e3a8a;
+  font-size: 1.2rem;
+}
+
+/* ===== BOTÓN BORRAR ===== */
+.btn-borrar {
+  margin-top: 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.btn-borrar:hover {
+  transform: scale(1.05);
+  background-color: #dc2626;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .barra-texto input {
+    width: 80%;
+  }
+
+  .tecla img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .tecla span {
+    font-size: 1rem;
+  }
+}
+
+/* ===== BOTÓN DE ESPACIO ===== */
+.btn-espacio {
+  margin-top: 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.btn-espacio:hover {
+  transform: scale(1.05);
+  background-color: #1e40af;
+}

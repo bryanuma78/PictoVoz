@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PictoVoz - Teclado LS</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+    <div class="nav-links">
+      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
+      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <!-- ===== SECCIÓN TECLADO LS ===== -->
+  <section id="teclado-ls">
+    <h2>🖐️ Teclado de Lengua de Señas</h2>
+    <p>Haz clic en las letras para formar tu palabra o frase:</p>
+
+    <!-- 🟦 CAMPO DE FRASE -->
+    <div class="barra-texto">
+      <input type="text" id="campo-frase" placeholder="Tu frase aparecerá aquí..." readonly />
+      <button id="btn-voz" title="Reproducir 🔊">
+        🔊
+      </button>
+    </div>
+
+    <!-- 🟩 TECLADO DE SEÑAS -->
+    <div class="contenedor-teclado">
+      <!-- Se generan las letras dinámicamente con JS -->
+    </div>
+
+    <!-- 🆕 BOTÓN DE ESPACIO -->
+    <button id="btn-espacio" class="btn-espacio">Espacio ␣</button>
+
+    <!-- BOTÓN BORRAR -->
+    <button id="btn-borrar" class="btn-borrar">Borrar</button>
+  </section>
+
+  <!-- ===== SCRIPT ===== -->
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const bienvenida = document.getElementById('bienvenida');
+    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+
+    async function mostrarUsuario() {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        const user = data?.user;
+        if (user) {
+          const nombre = user.user_metadata?.full_name ?? user.email;
+          bienvenida.textContent = `Bienvenido, ${nombre}`;
+        } else {
+          window.location.href = '/pages/Login/login.html';
+        }
+      } catch (err) {
+        console.error('Error al obtener usuario:', err.message);
+        window.location.href = '/pages/Login/login.html';
+      }
+    }
+    mostrarUsuario();
+
+    cerrarBtn.addEventListener('click', async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error al cerrar sesión:', error.message);
+        alert('No se pudo cerrar la sesión.');
+        return;
+      }
+      window.location.href = '/pages/Login/login.html';
+    });
+
+    /* ===== TECLADO DE SEÑAS ===== */
+    const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const contenedorTeclado = document.querySelector('.contenedor-teclado');
+    const campoFrase = document.getElementById('campo-frase');
+    const btnVoz = document.getElementById('btn-voz');
+    const btnBorrar = document.getElementById('btn-borrar');
+    const btnEspacio = document.getElementById('btn-espacio');
+
+    // Generar el teclado automáticamente
+    letras.forEach(letra => {
+      const div = document.createElement('div');
+      div.classList.add('tecla');
+      div.innerHTML = `
+        <img src="/images/LS/${letra}.png" alt="${letra}" />
+        <span>${letra}</span>
+      `;
+      div.addEventListener('click', () => {
+        campoFrase.value += letra;
+      });
+      contenedorTeclado.appendChild(div);
+    });
+
+    // 🔊 Reproducir con voz (Text-to-Speech)
+    btnVoz.addEventListener('click', () => {
+      const texto = campoFrase.value.trim();
+      if (!texto) return;
+      const speech = new SpeechSynthesisUtterance(texto);
+      speech.lang = 'es-ES';
+      speech.rate = 1;
+      window.speechSynthesis.speak(speech);
+    });
+
+    // 🔤 Espacio
+    btnEspacio.addEventListener('click', () => {
+      campoFrase.value += ' ';
+    });
+
+    // 🗑️ Borrar texto
+    btnBorrar.addEventListener('click', () => {
+      campoFrase.value = '';
+    });
+  </script>
+</body>
+</html>
