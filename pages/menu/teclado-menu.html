@@ -36,33 +36,42 @@
       </div>
     </div>
   </section>
-
-  <!-- ===== SCRIPT DE LÓGICA ===== -->
+  
   <script type="module">
-    import { supabase } from './pages/Login/supabase.js'; // 👈 ajusta la ruta si es necesario
-
+    import { supabase } from './pages/Login/supabase.js'; // ajusta la ruta si es necesario
+  
     const bienvenida = document.getElementById('bienvenida');
     const cerrarBtn = document.getElementById('cerrar-sesion-btn');
-
+  
+    // Mostrar usuario con manejo de errores
     async function mostrarUsuario() {
-      const { data, error } = await supabase.auth.getUser();
-      const user = data?.user;
-
-      if (user) {
-        const nombre = user.user_metadata?.full_name ?? user.email;
-        bienvenida.textContent = `Bienvenido, ${nombre}`;
-      } else {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+  
+        const user = data?.user;
+        if (user) {
+          const nombre = user.user_metadata?.full_name ?? user.email;
+          bienvenida.textContent = `Bienvenido, ${nombre}`;
+        } else {
+          window.location.href = './pages/Login/login.html';
+        }
+      } catch (err) {
+        console.error('Error al obtener el usuario:', err.message);
         window.location.href = './pages/Login/login.html';
       }
     }
-
+  
+    // Llamada a la función
     mostrarUsuario();
-
+  
+    // Cerrar sesión
     cerrarBtn.addEventListener('click', async () => {
       await supabase.auth.signOut();
       window.location.href = './pages/Login/login.html';
     });
   </script>
+  
 
 </body>
 </html>
