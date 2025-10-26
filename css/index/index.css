@@ -687,3 +687,137 @@ body {
   width: 20px;
   height: 20px;
 }
+
+/* 🎨 Estilos generales */
+#teclado-ls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.teclado-con-controles {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.contenedor-teclado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fila-teclado {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tecla {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 5px;
+  width: 60px;
+  transition: transform 0.1s;
+  background-color: #f8f9fa;
+}
+
+.tecla:hover {
+  transform: scale(1.05);
+  background-color: #e9ecef;
+}
+
+.tecla img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.tecla span {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* 🎛️ Botones laterales */
+.controles-laterales {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-borrar-letra,
+.btn-borrar,
+.btn-espacio {
+  padding: 12px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  width: 150px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-espacio { background-color: #007bff; }
+.btn-borrar-letra { background-color: #f39c12; }
+.btn-borrar { background-color: #e74c3c; }
+
+.btn-espacio:hover,
+.btn-borrar-letra:hover,
+.btn-borrar:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* 🟦 Barra de texto */
+.barra-texto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+/* ✅ Textarea sin límite de texto */
+#campo-frase {
+  width: 60%;
+  min-height: 50px;
+  max-height: 200px;
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+#btn-voz {
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #2ecc71;
+  color: white;
+  transition: transform 0.1s, opacity 0.2s;
+}
+
+#btn-voz:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
