@@ -59,6 +59,13 @@
   <!-- ===== FORMULARIO REGISTRO ===== -->
   <main class="login-container">
     <h2>Crear Cuenta</h2>
+
+    <!-- 🔹 Mensaje informativo -->
+    <p class="info-msg">
+      Usa un <strong>correo electrónico real</strong> (por ejemplo @gmail.com o @outlook.com) 
+      para que puedas recibir el correo de <strong>verificación</strong> y activar tu cuenta.
+    </p>
+
     <form id="registerForm">
       <input type="text" name="nombre" placeholder="Nombre completo" required>
       <input type="email" name="correo" placeholder="Correo electrónico" required>
@@ -75,6 +82,21 @@
       navLinks.classList.toggle('nav-open');
     });
   </script>
+
+  <style>
+    /* 🔹 Estilo del mensaje informativo */
+    .info-msg {
+      background: #fff8e1;
+      color: #444;
+      border: 1px solid #ffe082;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
 
 </body>
 </html>
