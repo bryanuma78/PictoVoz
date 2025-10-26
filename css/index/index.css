@@ -664,3 +664,26 @@ body {
   background-color: #1e40af;
 }
 
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #ccc;
+  color: #333;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.google-btn:hover {
+  background: #f7f7f7;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}

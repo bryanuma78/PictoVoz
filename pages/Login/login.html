@@ -11,13 +11,14 @@
     
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("loginForm");
+      const googleBtn = document.getElementById("googleLogin");
 
+      // 🔹 Login con email y contraseña
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const correo = form.correo.value.trim();
         const contraseña = form.contraseña.value;
 
-        // 🔑 Login con Supabase Auth (sin RPC)
         const { data, error } = await supabase.auth.signInWithPassword({
           email: correo,
           password: contraseña,
@@ -29,6 +30,21 @@
           alert("✅ Bienvenido a PictoVoz");
           console.log("Usuario logeado:", data.user.email);
           window.location.href = "/pages/menu/teclado-menu.html";
+        }
+      });
+
+      // 🔹 Login con Google
+      googleBtn.addEventListener("click", async () => {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + '/pages/menu/teclado-menu.html'
+          }
+        });
+
+        if (error) {
+          console.error("Error en Google Auth:", error.message);
+          alert("⚠️ Error al iniciar sesión con Google");
         }
       });
     });
@@ -57,11 +73,21 @@
   <!-- ===== FORMULARIO LOGIN ===== -->
   <main class="login-container">
     <h2>Iniciar Sesión</h2>
+
     <form id="loginForm">
       <input type="email" name="correo" placeholder="Correo electrónico" required>
       <input type="password" name="contraseña" placeholder="Contraseña" required>
       <button type="submit">Ingresar</button>
     </form>
+
+    <div class="divider">— o —</div>
+
+    <!-- 🔹 Botón de Google -->
+    <button id="googleLogin" class="google-btn">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s" alt="Google" class="google-icon">
+      Iniciar sesión con Google
+    </button>
+
     <p><a href="/pages/Login/register.html">Crear cuenta</a></p>
     <p><a href="/pages/Login/reset.html">¿Olvidaste tu contraseña?</a></p>
   </main>
