@@ -56,13 +56,42 @@
   <!-- ===== CONTACTO ===== -->
   <section id="contacto">
     <h2>Contáctanos</h2>
-    <form>
-      <input type="text" placeholder="Tu nombre" required />
-      <input type="email" placeholder="Tu correo" required />
-      <textarea rows="4" placeholder="Escribe tu mensaje..." required></textarea>
+    <form id="contactForm">
+      <input type="text" name="name" placeholder="Tu nombre" required />
+      <input type="email" name="email" placeholder="Tu correo" required />
+      <textarea name="message" rows="4" placeholder="Escribe tu mensaje..." required></textarea>
       <button type="submit">Enviar</button>
     </form>
   </section>
+
+  <!-- ===== EMAILJS SCRIPT ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="module">
+    // Inicializa EmailJS con tu clave pública
+    emailjs.init('KOtm5bZ6CjCY_R8ZK'); // 🔑 Reemplaza con tu Public Key real si cambia
+
+    const form = document.getElementById('contactForm');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const now = new Date().toLocaleString();
+
+      emailjs.send('service_aisfgyq', 'template_rx1s8tk', {
+        name: form.name.value,
+        email: form.email.value,
+        message: form.message.value,
+        time: now
+      })
+      .then(() => {
+        alert('✅ ¡Mensaje enviado correctamente! Gracias por contactarnos.');
+        form.reset();
+      }, (error) => {
+        console.error('Error:', error);
+        alert('⚠️ Error al enviar el mensaje. Intenta de nuevo más tarde.');
+      });
+    });
+  </script>
 
   <!-- ===== FOOTER ===== -->
   <footer>
