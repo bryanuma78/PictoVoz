@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PictoVoz - Teclado de Pictogramas</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #eaf4ff;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 20px;
+      color: #333;
+    }
+
+    #buscador-pictogramas {
+      margin: 20px auto;
+    }
+
+    #buscador-pictogramas input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 260px;
+      font-size: 1rem;
+    }
+
+    .modo-btn {
+      padding: 8px 14px;
+      margin-left: 6px;
+      border: none;
+      border-radius: 8px;
+      background-color: #5dbb63;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    .modo-btn:hover {
+      background-color: #4aa850;
+    }
+
+    .contenedor-teclado {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 25px;
+      justify-content: center;
+      align-items: start;
+      margin: 40px auto;
+      max-width: 95%;
+    }
+
+    .tecla-contenedor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tecla {
+      background-color: white;
+      border-radius: 18px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100px;
+      height: 100px;
+    }
+
+    .tecla:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .tecla img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .nombre-picto {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #444;
+      text-align: center;
+      margin-top: 6px;
+      word-wrap: break-word;
+      max-width: 100px;
+    }
+
+    #resultados-busqueda {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      width: 80%;
+      margin: 20px auto;
+    }
+
+    #resultados-busqueda img {
+      width: 100px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    #resultados-busqueda img:hover {
+      transform: scale(1.1);
+      border: 2px solid #5dbb63;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+    <div class="nav-links">
+      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
+      <a href="/pages/menu/teclado-menu.html">Menu</a>
+      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <section id="teclado-pictogramas">
+    <h2>🧩 Teclado de Pictogramas Personalizable</h2>
+    <p>Busca, agrega o edita tus pictogramas. Haz clic para escuchar la palabra.</p>
+
+    <div id="buscador-pictogramas">
+      <input type="text" id="input-busqueda" placeholder="Buscar pictograma..." />
+      <button id="btn-agregar" class="modo-btn">Buscar</button>
+      <button id="btn-editar" class="modo-btn">Editar</button>
+      <button id="btn-eliminar" class="modo-btn">Eliminar</button>
+    </div>
+
+    <div id="resultados-busqueda"></div>
+
+    <div class="teclado-con-controles">
+      <div class="contenedor-teclado" id="contenedor-pictogramas"></div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const bienvenida = document.getElementById('bienvenida');
+    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+    const inputBusqueda = document.getElementById('input-busqueda');
+    const btnAgregar = document.getElementById('btn-agregar');
+    const btnEditar = document.getElementById('btn-editar');
+    const btnEliminar = document.getElementById('btn-eliminar');
+    const contenedor = document.getElementById('contenedor-pictogramas');
+    const resultadosDiv = document.getElementById('resultados-busqueda');
+
+    let userId = null;
+    let modoActual = null;
+    let pictogramas = [];
+
+    const pictogramasDefecto = [
+      { palabra: "Hola", img: "/images/pictogramas/hola.png", fijo: true },
+      { palabra: "Comer", img: "/images/pictogramas/comer.png", fijo: true },
+      { palabra: "Beber", img: "/images/pictogramas/beber.png", fijo: true },
+      { palabra: "Dormir", img: "/images/pictogramas/dormir.png", fijo: true },
+      { palabra: "Baño", img: "/images/pictogramas/bano.png", fijo: true },
+      { palabra: "Agua", img: "/images/pictogramas/agua.png", fijo: true }
+    ];
+
+    async function mostrarUsuario() {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        const user = data?.user;
+        if (user) {
+          userId = user.id;
+          const nombre = user.user_metadata?.full_name ?? user.email;
+          bienvenida.textContent = `Bienvenido, ${nombre}`;
+          await cargarPictogramasUsuario();
+        } else {
+          window.location.href = '/pages/Login/login.html';
+        }
+      } catch (err) {
+        console.error('Error al obtener usuario:', err.message);
+        window.location.href = '/pages/Login/login.html';
+      }
+    }
+    mostrarUsuario();
+
+    cerrarBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = '/pages/Login/login.html';
+    });
+
+    async function cargarPictogramasUsuario() {
+      const { data, error } = await supabase
+        .from('pictogramas_usuario')
+        .select('palabra, img')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error al cargar pictogramas:', error.message);
+        pictogramas = pictogramasDefecto;
+      } else {
+        pictogramas = [...pictogramasDefecto, ...data.map(p => ({ ...p, fijo: false }))];
+      }
+
+      renderizarPictogramas();
+    }
+
+    async function guardarPictograma(picto) {
+      const { error } = await supabase
+        .from('pictogramas_usuario')
+        .insert([{ user_id: userId, palabra: picto.palabra, img: picto.img }]);
+      if (error) console.error('Error guardando pictograma:', error.message);
+    }
+
+    async function eliminarPictogramaDB(picto) {
+      const { error } = await supabase
+        .from('pictogramas_usuario')
+        .delete()
+        .eq('user_id', userId)
+        .eq('palabra', picto.palabra);
+      if (error) console.error('Error eliminando pictograma:', error.message);
+    }
+
+    function renderizarPictogramas() {
+      contenedor.innerHTML = '';
+      pictogramas.forEach((picto, index) => {
+        const cont = document.createElement('div');
+        cont.classList.add('tecla-contenedor');
+
+        const div = document.createElement('div');
+        div.classList.add('tecla');
+        div.innerHTML = `<img src="${picto.img}" alt="${picto.palabra}" />`;
+
+        const nombre = document.createElement('span');
+        nombre.classList.add('nombre-picto');
+        nombre.textContent = picto.palabra;
+        if (modoActual === 'editar' && !picto.fijo) nombre.contentEditable = true;
+
+        // 🔊 Reproducir voz
+        if (!modoActual) {
+          div.addEventListener('click', () => reproducirVoz(picto.palabra));
+        }
+
+        // 🗑️ Eliminar pictogramas del usuario (no los fijos)
+        if (modoActual === 'eliminar' && !picto.fijo) {
+          div.addEventListener('click', async () => {
+            if (confirm(`¿Eliminar pictograma "${picto.palabra}"?`)) {
+              await eliminarPictogramaDB(picto);
+              pictogramas.splice(index, 1);
+              renderizarPictogramas();
+            }
+          });
+        }
+
+        // ✏️ Editar texto (solo pictogramas del usuario)
+        if (modoActual === 'editar' && !picto.fijo) {
+          nombre.addEventListener('blur', async (e) => {
+            const nuevoTexto = e.target.textContent.trim();
+            pictogramas[index].palabra = nuevoTexto;
+            await supabase
+              .from('pictogramas_usuario')
+              .update({ palabra: nuevoTexto })
+              .eq('user_id', userId)
+              .eq('img', picto.img);
+          });
+        }
+
+        cont.appendChild(div);
+        cont.appendChild(nombre);
+        contenedor.appendChild(cont);
+      });
+    }
+
+    function reproducirVoz(texto) {
+      const utter = new SpeechSynthesisUtterance(texto);
+      utter.lang = 'es-ES';
+      utter.rate = 1;
+      speechSynthesis.speak(utter);
+    }
+
+    // 🔍 Buscar pictogramas con API de ARASAAC
+    btnAgregar.addEventListener('click', async () => {
+      modoActual = 'agregar';
+      const termino = inputBusqueda.value.trim();
+      resultadosDiv.innerHTML = '';
+
+      if (!termino) return alert('Escribe algo para buscar en ARASAAC.');
+
+      try {
+        const url = `https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(termino)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.length) {
+          resultadosDiv.innerHTML = '<p>No se encontraron pictogramas.</p>';
+          return;
+        }
+
+        data.slice(0, 20).forEach(picto => {
+          const imgUrl = `https://static.arasaac.org/pictograms/${picto._id}/${picto._id}_300.png`;
+          const img = document.createElement('img');
+          img.src = imgUrl;
+          img.alt = termino;
+
+          img.addEventListener('click', async () => {
+            if (pictogramas.length >= 81) {
+              alert('Has alcanzado el límite de 81 pictogramas (9x9).');
+              return;
+            }
+
+            const nuevoPicto = { palabra: termino, img: imgUrl, fijo: false };
+            pictogramas.push(nuevoPicto);
+            await guardarPictograma(nuevoPicto);
+            modoActual = null;
+            renderizarPictogramas();
+            reproducirVoz(termino);
+            resultadosDiv.innerHTML = '';
+            inputBusqueda.value = '';
+          });
+
+          resultadosDiv.appendChild(img);
+        });
+      } catch (err) {
+        console.error('Error buscando pictogramas:', err);
+        resultadosDiv.innerHTML = '<p>Error al conectar con la API de ARASAAC.</p>';
+      }
+    });
+
+    btnEditar.addEventListener('click', () => {
+      modoActual = 'editar';
+      renderizarPictogramas();
+    });
+
+    btnEliminar.addEventListener('click', () => {
+      modoActual = 'eliminar';
+      renderizarPictogramas();
+    });
+  </script>
+</body>
+</html>
