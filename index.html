@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PictoVoz</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -20,7 +19,6 @@
     <span>PictoVoz</span>
   </div>
 
-  <!-- DESKTOP -->
   <div class="hidden md:flex items-center gap-6 text-white font-semibold">
     <a href="#inicio" class="hover:underline">Inicio</a>
     <a href="#nosotros" class="hover:underline">Nosotros</a>
@@ -33,7 +31,6 @@
     </button>
   </div>
 
-  <!-- MOBILE BTN -->
   <button id="menuBtn" class="md:hidden text-white text-2xl">☰</button>
 </nav>
 
@@ -45,10 +42,6 @@ class="hidden flex-col bg-green-500 text-white font-semibold text-center py-4 sp
   <a href="#nosotros">Nosotros</a>
   <a href="#galeria">Galería</a>
   <a href="#contacto">Contacto</a>
-  <button onclick="window.location.href='./pages/Login/login.html'"
-  class="bg-white text-green-600 px-4 py-2 rounded-xl font-bold w-40 mx-auto">
-    Login
-  </button>
 </div>
 
 <!-- ===== INICIO ===== -->
@@ -57,7 +50,7 @@ class="hidden flex-col bg-green-500 text-white font-semibold text-center py-4 sp
     👋 ¡Bienvenido a PictoVoz!
   </h1>
   <p class="text-gray-600 max-w-2xl mx-auto">
-    Plataforma pensada para niños con discapacidad que convierte imágenes en voz y facilita la comunicación de forma divertida y accesible.
+    Plataforma pensada para niños con discapacidad que convierte imágenes en voz.
   </p>
 </section>
 
@@ -65,22 +58,58 @@ class="hidden flex-col bg-green-500 text-white font-semibold text-center py-4 sp
 <section id="nosotros" class="py-12 px-6 bg-white rounded-3xl shadow-xl max-w-5xl mx-auto">
   <h2 class="text-3xl font-bold text-gray-700 mb-4">🌱 Sobre Nosotros</h2>
   <p class="text-gray-600">
-    En PictoVoz creemos en la inclusión. Nuestro objetivo es ayudar a los niños a comunicarse mejor mediante pictogramas y voz.
+    Ayudamos a mejorar la comunicación mediante pictogramas.
   </p>
 </section>
 
-<!-- ===== GALERÍA ===== -->
+<!-- ===== GALERÍA PRO ===== -->
 <section id="galeria" class="py-16 px-6">
-  <h2 class="text-3xl font-bold text-gray-700 mb-8">🖼️ Galería</h2>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-5xl mx-auto">
-    <img src="https://picsum.photos/200?1" class="rounded-2xl shadow hover:scale-105 transition"/>
-    <img src="https://picsum.photos/200?2" class="rounded-2xl shadow hover:scale-105 transition"/>
-    <img src="https://picsum.photos/200?3" class="rounded-2xl shadow hover:scale-105 transition"/>
-    <img src="https://picsum.photos/200?4" class="rounded-2xl shadow hover:scale-105 transition"/>
-    <img src="https://picsum.photos/200?5" class="rounded-2xl shadow hover:scale-105 transition"/>
+  <h2 class="text-3xl font-bold text-gray-700 mb-10">🖼️ Galería</h2>
+
+  <div class="relative flex justify-center items-center max-w-5xl mx-auto h-[320px] overflow-hidden">
+
+    <!-- IZQUIERDA -->
+    <button id="prevBtn"
+    class="absolute left-0 z-20 bg-white/70 backdrop-blur-md hover:bg-white 
+    p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110">
+
+      <svg xmlns="http://www.w3.org/2000/svg" 
+      class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+        d="M15 19l-7-7 7-7"/>
+      </svg>
+
+    </button>
+
+    <!-- CARRUSEL -->
+    <div id="carousel"
+    class="flex items-center gap-6 transition-all duration-700 ease-in-out"></div>
+
+    <!-- DERECHA -->
+    <button id="nextBtn"
+    class="absolute right-0 z-20 bg-white/70 backdrop-blur-md hover:bg-white 
+    p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110">
+
+      <svg xmlns="http://www.w3.org/2000/svg" 
+      class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+        d="M9 5l7 7-7 7"/>
+      </svg>
+
+    </button>
+
   </div>
+
 </section>
+
+<!-- MODAL -->
+<div id="modalImg"
+class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+  <img id="imgGrande"
+  class="max-w-[90%] max-h-[80%] rounded-3xl border-4 border-white shadow-2xl"/>
+</div>
 
 <!-- ===== CONTACTO ===== -->
 <section id="contacto" class="py-12 px-6 bg-white rounded-3xl shadow-xl max-w-xl mx-auto">
@@ -107,47 +136,101 @@ class="hidden flex-col bg-green-500 text-white font-semibold text-center py-4 sp
 
 </section>
 
-<!-- ===== EMAILJS ===== -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script type="module">
-  emailjs.init('KOtm5bZ6CjCY_R8ZK');
-
-  const form = document.getElementById('contactForm');
-
-  form.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const now = new Date().toLocaleString();
-
-    emailjs.send('service_aisfgyq', 'template_rx1s8tk', {
-      name: form.name.value,
-      email: form.email.value,
-      message: form.message.value,
-      time: now
-    })
-    .then(() => {
-      alert('✅ Mensaje enviado correctamente');
-      form.reset();
-    })
-    .catch(() => {
-      alert('⚠️ Error al enviar');
-    });
-  });
-</script>
-
 <!-- ===== FOOTER ===== -->
 <footer class="mt-16 py-6 text-gray-600">
-  © 2025 PictoVoz | Comunicación sin barreras 🧩
+  © 2025 PictoVoz
 </footer>
 
-<!-- MENU SCRIPT -->
+<!-- ===== SCRIPT ===== -->
 <script>
-  const btn = document.getElementById("menuBtn");
-  const menu = document.getElementById("mobileMenu");
 
-  btn.addEventListener("click", () => {
-    menu.classList.toggle("hidden");
+const btn = document.getElementById("menuBtn");
+const menu = document.getElementById("mobileMenu");
+
+btn.addEventListener("click", () => {
+  menu.classList.toggle("hidden");
+});
+
+/* ===== IMÁGENES ===== */
+const imagenes = [
+  "https://picsum.photos/400?1",
+  "https://picsum.photos/400?2",
+  "https://picsum.photos/400?3",
+  "https://picsum.photos/400?4",
+  "https://picsum.photos/400?5",
+  "https://picsum.photos/400?6",
+  "https://picsum.photos/400?7"
+];
+
+let index = 0;
+const carousel = document.getElementById("carousel");
+
+/* ===== RENDER ===== */
+function renderCarousel() {
+
+  const getIndex = (i) => (i + imagenes.length) % imagenes.length;
+
+  const img2Left  = imagenes[getIndex(index - 2)];
+  const img1Left  = imagenes[getIndex(index - 1)];
+  const current   = imagenes[index];
+  const img1Right = imagenes[getIndex(index + 1)];
+  const img2Right = imagenes[getIndex(index + 2)];
+
+  carousel.innerHTML = `
+    <img src="${img2Left}"  
+    class="img w-24 opacity-20 scale-75 blur-[1px] rounded-2xl transition duration-500 cursor-pointer"/>
+
+    <img src="${img1Left}"  
+    class="img w-32 opacity-50 scale-90 rounded-2xl transition duration-500 cursor-pointer"/>
+
+    <img src="${current}"   
+    class="img w-72 scale-110 rounded-3xl shadow-2xl border-4 border-white transition duration-500 cursor-pointer"/>
+
+    <img src="${img1Right}" 
+    class="img w-32 opacity-50 scale-90 rounded-2xl transition duration-500 cursor-pointer"/>
+
+    <img src="${img2Right}" 
+    class="img w-24 opacity-20 scale-75 blur-[1px] rounded-2xl transition duration-500 cursor-pointer"/>
+  `;
+
+  activarClickImagen();
+}
+
+/* ===== BOTONES ===== */
+document.getElementById("nextBtn").onclick = () => {
+  index = (index + 1) % imagenes.length;
+  renderCarousel();
+};
+
+document.getElementById("prevBtn").onclick = () => {
+  index = (index - 1 + imagenes.length) % imagenes.length;
+  renderCarousel();
+};
+
+/* ===== AUTO SLIDE (15s) ===== */
+setInterval(() => {
+  index = (index + 1) % imagenes.length;
+  renderCarousel();
+}, 15000);
+
+/* ===== MODAL ===== */
+const modal = document.getElementById("modalImg");
+const imgGrande = document.getElementById("imgGrande");
+
+function activarClickImagen() {
+  document.querySelectorAll(".img").forEach(img => {
+    img.onclick = () => {
+      imgGrande.src = img.src;
+      modal.classList.remove("hidden");
+    };
   });
+}
+
+modal.onclick = () => modal.classList.add("hidden");
+
+/* INIT */
+renderCarousel();
+
 </script>
 
 </body>
