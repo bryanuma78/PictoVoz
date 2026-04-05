@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restablecer Contraseña | PictoVoz</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    const form = document.getElementById("resetForm");
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = form.correo.value.trim();
+
+      // Enviar correo de restablecimiento
+      const { error } = await supabase.auth.resetPasswordForEmail(correo, {
+        redirectTo: "https://pictovoz.netlify.app/pages/Login/nueva_contraseña.html"
+
+      });
+
+      if (error) {
+        alert("⚠️ Error: " + error.message);
+      } else {
+        alert("📧 Revisa tu correo para continuar con el restablecimiento.");
+        form.reset();
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+    <div class="nav-links">
+      <a href="/index.html">Inicio</a>
+      <a href="/pages/Login/login.html">Iniciar Sesión</a>
+    </div>
+  </nav>
+
+  <main class="login-container">
+    <h2>Recuperar Contraseña</h2>
+    <form id="resetForm">
+      <input type="email" name="correo" placeholder="Ingresa tu correo" required />
+      <button type="submit">Enviar enlace</button>
+    </form>
+    <p><a href="/pages/Login/login.html">Volver al inicio de sesión</a></p>
+  </main>
+</body>
+</html>

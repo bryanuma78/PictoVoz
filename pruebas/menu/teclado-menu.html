@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PictoVoz - Elige Teclado</title>
+  <link rel="stylesheet" href="/css/index/index.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+
+    <div class="nav-links">
+      <!-- 👇 nombre corregido -->
+      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
+      <!-- 👇 botón con ID -->
+      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <!-- ===== SELECCIÓN DE TECLADO ===== -->
+  <section id="seleccion-teclado">
+    <h2>Elige tu teclado 🖐️🧩</h2>
+    <p>Selecciona cómo quieres comunicarte:</p>
+    <div class="teclado-opciones">
+      <div class="opcion" onclick="window.location.href='/pages/LS/Lenguaje_LS.html'">
+        <img src="/images/TecladoLS_boton.png" alt="Teclado Lengua de Señas">
+        <span>Teclado LS</span>
+      </div>
+      <div class="opcion" onclick="window.location.href='/pages/pictograms/pictograma.html'">
+        <img src="/images/pictograma_boton.png" alt="Teclado Pictogramas">
+        <span>Teclado Pictogramas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCRIPT DE LÓGICA ===== -->
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js'; // ✅ Ruta corregida
+
+    const bienvenida = document.getElementById('bienvenida');
+    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+
+    // ✅ Mostrar usuario con manejo de errores
+    async function mostrarUsuario() {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+
+        const user = data?.user;
+        if (user) {
+          const nombre = user.user_metadata?.full_name ?? user.email;
+          bienvenida.textContent = `Bienvenido, ${nombre}`;
+        } else {
+          window.location.href = '/pages/Login/login.html';
+        }
+      } catch (err) {
+        console.error('Error al obtener el usuario:', err.message);
+        window.location.href = '/pages/Login/login.html';
+      }
+    }
+
+    mostrarUsuario();
+
+    // ✅ Cerrar sesión correctamente
+    cerrarBtn.addEventListener('click', async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error al cerrar sesión:', error.message);
+        alert('No se pudo cerrar la sesión.');
+        return;
+      }
+      window.location.href = '/pages/Login/login.html';
+    });
+  </script>
+
+</body>
+</html>

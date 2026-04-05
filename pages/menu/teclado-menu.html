@@ -2,82 +2,118 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PictoVoz - Elige Teclado</title>
-  <link rel="stylesheet" href="/css/index/index.css" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar">
-    <div class="nav-logo">
-      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
-      <span>PictoVoz</span>
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="flex justify-between items-center bg-gradient-to-r from-green-500 to-green-400 px-6 py-4 shadow-lg rounded-b-3xl">
+  
+  <div class="flex items-center gap-3 text-white font-bold text-xl">
+    <img src="/images/pictovoz.png" 
+    class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md hover:scale-110 transition"/>
+
+    <span>PictoVoz</span>
+  </div>
+
+  <div class="flex items-center gap-4 text-white">
+    <span id="bienvenida" class="font-semibold hidden sm:block"></span>
+
+    <button id="cerrar-sesion-btn"
+      class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+      Cerrar Sesión
+    </button>
+  </div>
+</nav>
+
+<!-- ===== SELECCIÓN ===== -->
+<section class="mt-10 px-4">
+
+  <h2 class="text-3xl font-extrabold text-gray-700">
+    🧩 Elige tu teclado
+  </h2>
+
+  <p class="text-gray-600 mt-2">
+    Selecciona cómo quieres comunicarte
+  </p>
+
+  <!-- OPCIONES -->
+  <div class="mt-10 flex flex-wrap justify-center gap-10">
+
+    <!-- OPCIÓN 1 -->
+    <div onclick="window.location.href='/pages/LS/Lenguaje_LS.html'"
+      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition w-64">
+
+      <img src="/images/TecladoLS_boton.png"
+        class="w-40 mx-auto mb-4 rounded-xl"/>
+
+      <span class="block text-lg font-bold text-gray-700">
+        ✋ Teclado Lengua de Señas
+      </span>
     </div>
 
-    <div class="nav-links">
-      <!-- 👇 nombre corregido -->
-      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
-      <!-- 👇 botón con ID -->
-      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+    <!-- OPCIÓN 2 -->
+    <div onclick="window.location.href='/pages/pictograms/pictograma.html'"
+      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition w-64">
+
+      <img src="/images/pictograma_boton.png"
+        class="w-40 mx-auto mb-4 rounded-xl"/>
+
+      <span class="block text-lg font-bold text-gray-700">
+        🖼️ Teclado Pictogramas
+      </span>
     </div>
-  </nav>
 
-  <!-- ===== SELECCIÓN DE TECLADO ===== -->
-  <section id="seleccion-teclado">
-    <h2>Elige tu teclado 🖐️🧩</h2>
-    <p>Selecciona cómo quieres comunicarte:</p>
-    <div class="teclado-opciones">
-      <div class="opcion" onclick="window.location.href='/pages/LS/Lenguaje_LS.html'">
-        <img src="/images/TecladoLS_boton.png" alt="Teclado Lengua de Señas">
-        <span>Teclado LS</span>
-      </div>
-      <div class="opcion" onclick="window.location.href='/pages/pictograms/pictograma.html'">
-        <img src="/images/pictograma_boton.png" alt="Teclado Pictogramas">
-        <span>Teclado Pictogramas</span>
-      </div>
-    </div>
-  </section>
+  </div>
 
-  <!-- ===== SCRIPT DE LÓGICA ===== -->
-  <script type="module">
-    import { supabase } from '/pages/Login/supabase.js'; // ✅ Ruta corregida
+</section>
 
-    const bienvenida = document.getElementById('bienvenida');
-    const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+<!-- ===== SCRIPT ===== -->
+<script type="module">
+  import { supabase } from '/pages/Login/supabase.js';
 
-    // ✅ Mostrar usuario con manejo de errores
-    async function mostrarUsuario() {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) throw error;
+  const bienvenida = document.getElementById('bienvenida');
+  const cerrarBtn = document.getElementById('cerrar-sesion-btn');
 
-        const user = data?.user;
-        if (user) {
-          const nombre = user.user_metadata?.full_name ?? user.email;
-          bienvenida.textContent = `Bienvenido, ${nombre}`;
-        } else {
-          window.location.href = '/pages/Login/login.html';
-        }
-      } catch (err) {
-        console.error('Error al obtener el usuario:', err.message);
+  async function mostrarUsuario() {
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+
+      const user = data?.user;
+
+      if (user) {
+        const nombre = user.user_metadata?.full_name ?? user.email;
+        bienvenida.textContent = `👋 Bienvenido, ${nombre}`;
+      } else {
         window.location.href = '/pages/Login/login.html';
       }
+
+    } catch (err) {
+      console.error('Error al obtener el usuario:', err.message);
+      window.location.href = '/pages/Login/login.html';
+    }
+  }
+
+  mostrarUsuario();
+
+  cerrarBtn.addEventListener('click', async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error al cerrar sesión:', error.message);
+      alert('No se pudo cerrar la sesión.');
+      return;
     }
 
-    mostrarUsuario();
-
-    // ✅ Cerrar sesión correctamente
-    cerrarBtn.addEventListener('click', async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error al cerrar sesión:', error.message);
-        alert('No se pudo cerrar la sesión.');
-        return;
-      }
-      window.location.href = '/pages/Login/login.html';
-    });
-  </script>
+    window.location.href = '/pages/Login/login.html';
+  });
+</script>
 
 </body>
 </html>

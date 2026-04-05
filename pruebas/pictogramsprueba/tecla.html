@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teclado de Pictogramas con Voz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #5d4edf;
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .perfil-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .pictogram-keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 120px); /* 10 columnas */
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center; /* Centra las columnas */
+            overflow-x: auto; /* Permite desplazamiento horizontal si el contenido excede el ancho */
+        }
+        .pictogram-button {
+            width: 120px;
+            height: 120px;
+            background-color: #f7f7f7;
+            border: 2px solid #ccc;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            padding: 10px;
+        }
+        .pictogram-button:hover {
+            background-color: #e0e0e0;
+        }
+        .pictogram-label {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .agregar-pictograma {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .agregar-pictograma input {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .agregar-pictograma button {
+            padding: 10px 20px;
+            background-color: #32cd32;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .agregar-pictograma button:hover {
+            background-color: #228b22;
+        }
+
+        /* Estilo llamativo para el botón de cerrar sesión */
+        .cerrar-sesion {
+            background-color: #ff4500;
+            color: white;
+            font-size: 20px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .cerrar-sesion:hover {
+            background-color: #ff6347;
+            transform: scale(1.1);
+        }
+
+        .cerrar-sesion:active {
+            background-color: #ff0000;
+            transform: scale(1);
+        }
+    </style>
+    <script>
+        // Función para hablar el mensaje con el asistente virtual
+        function speakMessage(message) {
+            const utterance = new SpeechSynthesisUtterance(message);
+            utterance.lang = "es-ES"; // Configuración de idioma
+            speechSynthesis.speak(utterance);
+        }
+
+        // Función que simula el envío del mensaje al asistente
+        function sendToAssistant(pictogram, label) {
+            console.log("Enviado al asistente: ", label);
+            speakMessage(label); // Reproduce el mensaje en voz
+            const output = document.getElementById('output');
+            output.textContent = `Mensaje enviado: ${label}`;
+        }
+
+        // Función para agregar un nuevo pictograma personalizado
+        function agregarPictograma() {
+            const texto = document.getElementById('textoPictograma').value;
+            const archivo = document.getElementById('imagenPictograma').files[0];
+
+            if (texto && archivo) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagenURL = e.target.result;
+                    const pictogramaContainer = document.createElement('div');
+                    pictogramaContainer.classList.add('pictogram-button');
+
+                    const imagen = document.createElement('img');
+                    imagen.src = imagenURL;
+                    imagen.style.width = '50px';
+                    imagen.style.height = '50px';
+
+                    const textoPictograma = document.createElement('span');
+                    textoPictograma.innerText = texto;
+                    pictogramaContainer.appendChild(imagen);
+                    pictogramaContainer.appendChild(textoPictograma);
+
+                    pictogramaContainer.onclick = function() {
+                        sendToAssistant(imagen, texto);
+                    };
+
+                    document.querySelector('.pictogram-keyboard').appendChild(pictogramaContainer);
+                };
+                reader.readAsDataURL(archivo); // Leer la imagen seleccionada
+            } else {
+                alert('Por favor, ingresa texto y selecciona una imagen.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <button class="cerrar-sesion" onclick="window.location.href='inicio.html'">Cerrar sesión</button>
+    </div>
+
+    <h1>Teclado de Pictogramas con Voz</h1>
+    <p>Haz clic en los pictogramas para comunicarte.</p>
+    
+    <div class="pictogram-keyboard">
+        <!-- Pictogramas predeterminados -->
+        <button class="pictogram-button" onclick="sendToAssistant('😀', 'Feliz')">
+            😀
+            <div class="pictogram-label">Feliz</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🍎', 'Manzana')">
+            🍎
+            <div class="pictogram-label">Manzana</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🚗', 'Auto')">
+            🚗
+            <div class="pictogram-label">Auto</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🚻', 'Quiero ir al baño')">
+            🚻
+            <div class="pictogram-label">Quiero ir al baño</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🛌', 'Quiero ir a dormir')">
+            🛌
+            <div class="pictogram-label">Quiero ir a Dormir</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🍽️', 'Quiero comer')">
+            🍽️
+            <div class="pictogram-label">Quiero Comer</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('💧', 'Quiero agua')">
+            💧
+            <div class="pictogram-label">Quiero Agua</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🛁', 'Quiero bañarme')">
+            🛁
+            <div class="pictogram-label">Quiero Bañarme</div>
+        </button>
+        <!-- Pictogramas nuevos -->
+        <button class="pictogram-button" onclick="sendToAssistant('🚪', 'Quiero salir')">
+            🚪
+            <div class="pictogram-label">Quiero Salir</div>
+        </button>
+        <button class="pictogram-button" onclick="sendToAssistant('🤗', 'Quiero un abrazo')">
+            🤗
+            <div class="pictogram-label">Quiero un Abrazo</div>
+        </button>
+    </div>
+
+    <div class="agregar-pictograma">
+        <h3>Agregar un pictograma personalizado</h3>
+        <input type="text" id="textoPictograma" placeholder="Escribe lo que quieres decir...">
+        <input type="file" id="imagenPictograma" accept="image/*">
+        <button onclick="agregarPictograma()">Agregar Pictograma</button>
+    </div>
+
+    <div id="output"></div>
+
+</body>
+</html>
+
+
+
+

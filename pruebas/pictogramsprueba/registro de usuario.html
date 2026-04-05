@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro para Niños</title>
+    <link rel="stylesheet" href="./css/formulario.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Registro</h1>
+        <form action="#" method="post">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
+
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" placeholder="Ingresa tu apellido" required>
+
+            <label for="usuario">Usuario (@usuario):</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required>
+
+            <label for="contrasena">Contraseña:</label>
+            <input type="password" id="contrasena" name="contrasena" placeholder="Crea una contraseña" required>
+
+            <label for="verificar_contrasena">Verificar Contraseña:</label>
+            <input type="password" id="verificar_contrasena" name="verificar_contrasena" placeholder="Repite la contraseña" required>
+
+            <button type="submit">¡Regístrate!</button>
+        </form>
+        
+        <!-- Redirección para usuarios con cuenta -->
+        <a href="/inicio.html">Iniciar sesión</a></p>
+    </div>
+
+    <script>
+        // Script para verificar que las contraseñas coinciden
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const password = document.getElementById('contrasena').value;
+            const confirmPassword = document.getElementById('verificar_contrasena').value;
+
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden. Por favor, intenta de nuevo.');
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PictoVoz</title>
+  <link rel="stylesheet" href="./css/index/index.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
+      <span>PictoVoz</span>
+    </div>
+
+    <!-- Botón hamburguesa -->
+    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+
+    <!-- Enlaces del menú -->
+    <div class="nav-links">
+      <a href="#inicio">Inicio</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#galeria">Galería</a>
+      <a href="#contacto">Contacto</a>
+      <button class="login-btn" onclick="window.location.href='./pages/Login/login.html'">Login</button>
+    </div>
+  </nav>
+
+  <!-- ===== INICIO ===== -->
+  <section id="inicio">
+    <h1>¡Hola! 👋 Bienvenido a PictoVoz</h1>
+    <p>Una plataforma pensada para niños con discapacidad, que convierte imágenes en voz y facilita la comunicación de forma divertida, clara y segura.</p>
+  </section>
+
+  <!-- ===== NOSOTROS ===== -->
+  <section id="nosotros">
+    <h2>Sobre Nosotros</h2>
+    <p>En PictoVoz creemos en la inclusión. Nuestro objetivo es ayudar a los niños con discapacidad a comunicarse mejor mediante pictogramas y voz.  
+    Cada herramienta está pensada para ser fácil, colorida y accesible.</p>
+  </section>
+
+  <!-- ===== GALERÍA ===== -->
+  <section id="galeria">
+    <h2>Nuestra Galería</h2>
+    <div class="collage">
+      <img src="https://picsum.photos/200?random=1" alt="Imagen 1">
+      <img src="https://picsum.photos/200?random=2" alt="Imagen 2">
+      <img src="https://picsum.photos/200?random=3" alt="Imagen 3">
+      <img src="https://picsum.photos/200?random=4" alt="Imagen 4">
+      <img src="https://picsum.photos/200?random=5" alt="Imagen 5">
+    </div>
+  </section>
+
+  <!-- ===== CONTACTO ===== -->
+  <section id="contacto">
+    <h2>Contáctanos</h2>
+    <form id="contactForm">
+      <input type="text" name="name" placeholder="Tu nombre" required />
+      <input type="email" name="email" placeholder="Tu correo" required />
+      <textarea name="message" rows="4" placeholder="Escribe tu mensaje..." required></textarea>
+      <button type="submit">Enviar</button>
+    </form>
+  </section>
+
+  <!-- ===== EMAILJS SCRIPT ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="module">
+    // Inicializa EmailJS con tu clave pública
+    emailjs.init('KOtm5bZ6CjCY_R8ZK'); // 🔑 Reemplaza con tu Public Key real si cambia
+
+    const form = document.getElementById('contactForm');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const now = new Date().toLocaleString();
+
+      emailjs.send('service_aisfgyq', 'template_rx1s8tk', {
+        name: form.name.value,
+        email: form.email.value,
+        message: form.message.value,
+        time: now
+      })
+      .then(() => {
+        alert('✅ ¡Mensaje enviado correctamente! Gracias por contactarnos.');
+        form.reset();
+      }, (error) => {
+        console.error('Error:', error);
+        alert('⚠️ Error al enviar el mensaje. Intenta de nuevo más tarde.');
+      });
+    });
+  </script>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2025 PictoVoz | Creando comunicación sin barreras 🧩</p>
+  </footer>
+
+  <!-- ===== SCRIPT MENÚ RESPONSIVO ===== -->
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    toggle.addEventListener('click', () => {
+      navLinks.classList.toggle('nav-open');
+    });
+  </script>
+</body>
+</html>

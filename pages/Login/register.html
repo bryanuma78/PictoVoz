@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registrarse | PictoVoz</title>
-  <link rel="stylesheet" href="/css/index/index.css">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
@@ -14,11 +16,12 @@
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         const nombre = form.nombre.value.trim();
         const correo = form.correo.value.trim();
         const contraseña = form.contraseña.value;
 
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: correo,
           password: contraseña,
           options: {
@@ -29,7 +32,7 @@
         if (error) {
           alert("⚠️ " + error.message);
         } else {
-          alert("✅ Cuenta creada correctamente. Revisa tu correo para confirmar tu cuenta.");
+          alert("✅ Cuenta creada. Revisa tu correo para confirmar.");
           window.location.href = "/pages/Login/login.html";
         }
       });
@@ -37,66 +40,91 @@
   </script>
 </head>
 
-<body>
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 min-h-screen flex flex-col">
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar">
-    <div class="nav-logo">
-      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
-      <span>PictoVoz</span>
+<!-- ===== NAVBAR ===== -->
+<nav class="flex justify-between items-center bg-gradient-to-r from-green-500 to-green-400 px-6 py-4 shadow-lg rounded-b-3xl">
+  
+  <div class="flex items-center gap-3 text-white font-bold text-xl">
+    <img src="/images/pictovoz.png"
+      class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md"/>
+    <span>PictoVoz</span>
+  </div>
+
+  <!-- MENU DESKTOP -->
+  <div class="hidden md:flex gap-6 text-white font-semibold">
+    <a href="/index.html" class="hover:underline">Inicio</a>
+    <a href="/pages/Login/login.html" class="hover:underline">Iniciar Sesión</a>
+    <a href="/pages/Login/reset.html" class="hover:underline">Recuperar</a>
+    <a href="#" class="hover:underline">Ayuda</a>
+  </div>
+
+  <!-- BOTÓN MOBILE -->
+  <button id="menuBtn" class="md:hidden text-white text-2xl">☰</button>
+</nav>
+
+<!-- MENU MOBILE -->
+<div id="mobileMenu"
+class="hidden flex-col bg-green-500 text-white font-semibold text-center py-4 space-y-3 md:hidden">
+
+  <a href="/index.html">Inicio</a>
+  <a href="/pages/Login/login.html">Iniciar Sesión</a>
+  <a href="/pages/Login/reset.html">Recuperar</a>
+  <a href="#">Ayuda</a>
+</div>
+
+<!-- ===== FORMULARIO ===== -->
+<main class="flex flex-1 items-center justify-center px-4">
+
+  <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">
+      📝 Crear Cuenta
+    </h2>
+
+    <!-- MENSAJE -->
+    <div class="bg-yellow-100 border border-yellow-300 text-gray-700 p-3 rounded-xl text-sm mb-5 shadow-sm">
+      Usa un <strong>correo real</strong> (ej: Gmail) para recibir el correo de verificación.
     </div>
 
-    <button class="nav-toggle" aria-label="Abrir menú">☰</button>
+    <form id="registerForm" class="space-y-4">
 
-    <div class="nav-links">
-      <a href="/index.html">Inicio</a>
-      <a href="/pages/Login/login.html">Iniciar Sesión</a>
-      <a href="/pages/Login/reset.html">Recuperar</a>
-      <a href="#">Ayuda</a>
-    </div>
-  </nav>
+      <input type="text" name="nombre" placeholder="Nombre completo" required
+      class="w-full px-4 py-3 rounded-xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none"/>
 
-  <!-- ===== FORMULARIO REGISTRO ===== -->
-  <main class="login-container">
-    <h2>Crear Cuenta</h2>
+      <input type="email" name="correo" placeholder="Correo electrónico" required
+      class="w-full px-4 py-3 rounded-xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none"/>
 
-    <!-- 🔹 Mensaje informativo -->
-    <p class="info-msg">
-      Usa un <strong>correo electrónico real</strong> (por ejemplo @gmail.com o @outlook.com) 
-      para que puedas recibir el correo de <strong>verificación</strong> y activar tu cuenta.
+      <input type="password" name="contraseña" placeholder="Contraseña" required
+      class="w-full px-4 py-3 rounded-xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none"/>
+
+      <button type="submit"
+      class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold transition">
+        Registrarse
+      </button>
+
+    </form>
+
+    <p class="mt-5 text-sm text-gray-600">
+      ¿Ya tienes cuenta?
+      <a href="/pages/Login/login.html" class="text-green-600 font-semibold hover:underline">
+        Inicia sesión
+      </a>
     </p>
 
-    <form id="registerForm">
-      <input type="text" name="nombre" placeholder="Nombre completo" required>
-      <input type="email" name="correo" placeholder="Correo electrónico" required>
-      <input type="password" name="contraseña" placeholder="Contraseña" required>
-      <button type="submit">Registrarse</button>
-    </form>
-    <p><a href="/pages/Login/login.html">¿Ya tienes cuenta? Inicia sesión</a></p>
-  </main>
+  </div>
 
-  <script>
-    const toggle = document.querySelector('.nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    toggle.addEventListener('click', () => {
-      navLinks.classList.toggle('nav-open');
-    });
-  </script>
+</main>
 
-  <style>
-    /* 🔹 Estilo del mensaje informativo */
-    .info-msg {
-      background: #fff8e1;
-      color: #444;
-      border: 1px solid #ffe082;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 15px;
-      font-size: 0.95rem;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-  </style>
+<!-- SCRIPT MENU -->
+<script>
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  menuBtn.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
+  });
+</script>
 
 </body>
 </html>
