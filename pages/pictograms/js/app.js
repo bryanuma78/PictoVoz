@@ -58,8 +58,8 @@ async function verificarUsuario() {
         if (user) {
             userId = user.id;
             const nombre = user.user_metadata?.full_name || user.email;
-            bienvenida.textContent = `👋 ${nombre}`;
-            bienvenidaMobile.textContent = `👋 ${nombre}`;
+            bienvenida.textContent = `${nombre}`;
+            bienvenidaMobile.textContent = `${nombre}`;
             cargarPictogramas();
         } else {
             location.href = '/pages/Login/login.html';

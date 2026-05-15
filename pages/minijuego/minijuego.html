@@ -70,17 +70,17 @@
   <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
     <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
     <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">
-      📋 Menu
+      Menu
     </a>
     <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
-      🚪 Cerrar Sesión
+      Cerrar Sesión
     </button>
   </div>
 </nav>
 
 <!-- SECCIÓN PRINCIPAL: TECLADO -->
 <section class="mt-6 px-2 md:px-4">
-    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">🧩 Teclado de Pictogramas</h2>
+    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">MINIJUEGO DE PICTOGRAMAS</h2>
 
     <!-- CONTROLES -->
     <div class="mt-6 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
@@ -240,8 +240,8 @@ async function mostrarUsuario(){
     if(user){
       userId = user.id;
       const nombre = user.user_metadata?.full_name || user.email;
-      bienvenida.textContent = `👋 ${nombre}`;
-      bienvenidaMobile.textContent = `👋 ${nombre}`;
+      bienvenida.textContent = `${nombre}`;
+      bienvenidaMobile.textContent = `${nombre}`;
       cargar();
     }else{
       location.href='/pages/Login/login.html';

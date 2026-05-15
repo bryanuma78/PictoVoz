@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Acerca de | PictoVoz</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden antialiased">
+
+<!-- NAVBAR RESPONSIVE PÚBLICO -->
+<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+  <div class="flex justify-between items-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+      <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+      <span class="text-xl md:text-2xl">PictoVoz</span>
+    </div>
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:flex items-center gap-6 text-white font-bold">
+      <a href="/index.html" class="hover:bg-white/20 px-3 py-2 rounded-xl transition">Inicio</a>
+      
+      <button onclick="window.location.href='/pages/Login/login.html'"
+      class="bg-white text-green-600 px-5 py-2 rounded-2xl font-black shadow-md hover:scale-105 transition-all">
+        Login
+      </button>
+    </div>
+
+    <!-- BOTON MENU MOBILE -->
+    <button id="menuBtn" class="text-white text-4xl font-bold transition md:hidden hover:scale-110">
+      ☰
+    </button>
+
+  </div>
+
+  <!-- MENU MOBILE -->
+  <div id="mobileMenu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in text-lg font-bold">
+    <a href="/index.html" class="hover:bg-white/20 py-2 rounded-xl transition">Inicio</a>
+    
+    <button onclick="window.location.href='/pages/Login/login.html'"
+    class="bg-white text-green-600 py-3 rounded-2xl font-black shadow-md transition w-full">
+      Login
+    </button>
+  </div>
+</nav>
+
+<!-- ===== CONTENIDO PRINCIPAL ===== -->
+<main class="max-w-5xl mx-auto px-4 py-12 space-y-10">
+
+  <!-- CARD 1: PROYECTO DE INVESTIGACIÓN / TESIS -->
+  <section class="bg-white rounded-3xl shadow-xl p-6 sm:p-10 border-4 border-green-200 transition hover:shadow-2xl duration-300">
+    <span class="bg-green-100 text-green-700 font-black text-sm px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 inline-block">
+      Proyecto de Titulación
+    </span>
+    <h1 class="text-3xl md:text-4xl font-black text-gray-700 mb-6">
+      Desarrollo de la Plataforma PictoVoz
+    </h1>
+    <p class="text-lg text-gray-600 font-medium leading-relaxed max-w-3xl mx-auto mb-8">
+      Esta aplicación web ha sido desarrollada como tema central de tesis de grado por los estudiantes investigadores de la Escuela Superior Politécnica de Chimborazo.
+    </p>
+
+    <!-- Autores Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+      <div class="bg-gradient-to-br from-green-50 to-blue-50 p-5 rounded-2xl border-2 border-green-200 shadow-sm">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Investigador</p>
+        <p class="text-xl font-black text-gray-700 mt-1">BRYAN JOEL UMAJINGA QUISHPE</p>
+      </div>
+      <div class="bg-gradient-to-br from-green-50 to-blue-50 p-5 rounded-2xl border-2 border-green-200 shadow-sm">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Investigador</p>
+        <p class="text-xl font-black text-gray-700 mt-1">VICTOR SAEZ</p>
+      </div>
+    </div>
+
+    <!-- Institución Detalle -->
+    <div class="mt-8 pt-6 border-t-2 border-gray-100 text-gray-500 font-bold text-base md:text-lg">
+    <span class="text-green-600">ESPOCH</span> · Sede Orellana · Carrera de Tecnologías de la Información (<span class="text-blue-500">TI</span>)
+    </div>
+  </section>
+
+  <!-- CARD 2: GRUPO OBJETIVO / A QUIÉN VA DIRIGIDO -->
+  <section class="bg-white rounded-3xl shadow-xl p-6 sm:p-10 border-4 border-blue-200 transition hover:shadow-2xl duration-300">
+    <h2 class="text-3xl font-extrabold text-blue-600 mb-4">¿A quién va dirigido?</h2>
+    <p class="text-lg text-gray-600 font-medium leading-relaxed max-w-3xl mx-auto mb-6">
+      PictoVoz está diseñado específicamente como una herramienta tecnológica inclusiva de asistencia para **niños con discapacidad o necesidades específicas de interacción cognitiva, verbal o comunicativa**. 
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-bold text-gray-700 text-base max-w-4xl mx-auto mt-4">
+      <div class="p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">Apoyo Cognitivo Aumentativo</div>
+      <div class="p-4 bg-blue-50 rounded-2xl border-2 border-blue-200">Conversión de Imágenes a Voz</div>
+      <div class="p-4 bg-green-50 rounded-2xl border-2 border-green-200">Accesibilidad por Control Facial</div>
+    </div>
+  </section>
+
+  <!-- CARD 3: AUDITORÍA DE LICENCIAS Y MARCA ARASAAC -->
+  <section class="bg-white rounded-3xl shadow-xl p-6 sm:p-10 border-4 border-purple-200 transition hover:shadow-2xl duration-300 text-left">
+    <h2 class="text-3xl font-extrabold text-purple-600 mb-6 text-center">Auditoría de Propiedad Intelectual y Licencias</h2>
+    
+    <div class="space-y-4 text-gray-600 font-medium text-sm md:text-base leading-relaxed">
+      <div class="bg-purple-50 p-4 rounded-2xl border-2 border-purple-100 mb-6">
+        <p class="text-purple-900 font-bold text-base mb-1">Nota de Auditoría de Sistemas y Cumplimiento de Software:</p>
+        <p class="text-purple-700 text-sm">Este sistema informático web integra catálogos de recursos multimedia externos. Como parte de los protocolos de auditoría de licenciamiento y cumplimiento tecnológico del proyecto de tesis, se certifica que el software opera bajo fines estrictamente <strong>educativos, sociales y sin fines de lucro</strong>, acatando las restricciones y mandatos legales de propiedad intelectual correspondientes.</p>
+      </div>
+
+      <p>
+        <strong>ARASAAC</strong> es una marca del Gobierno de Aragón (España), inscrita en la Oficina Española de Patentes y Marcas. La colección de pictogramas ARASAAC está inscrita en el Registro General de la Propiedad Intelectual (Núm. Depósito Legal Z 901-2013) como obra colectiva a nombre de la <strong>Diputación General de Aragón</strong>, quien la ha editado y divulgado de conformidad a lo dispuesto en el artículo 8 del texto refundido de la Ley de Propiedad Intelectual, aprobado por el Real Decreto Legislativo 1/1996, de 12 de abril.
+      </p>
+      <p>
+        Los recursos que se ofrecen en el sitio web (pictogramas, imágenes, locuciones o vídeos), al igual que los materiales elaborados a partir de éstos, se publican bajo <strong>Licencia Creative Commons BY-NC-SA</strong>, autorizándose su uso para fines sin ánimo lucrativo siempre que se cite la fuente, autor y se compartan bajo la misma licencia. Queda excluido de este permiso, por tanto, el uso de estos recursos dentro de cualquier producto o publicación con fines comerciales.
+      </p>
+      <p>
+        Cualquier obra derivada a partir los recursos contenidos en los catálogos de ARASAAC, se debe distribuir con la misma Licencia Creative Commons BY-NC-SA, se debe citar al autor (Sergio Palao) y al propietario (Gobierno de Aragón), la procedencia de los mismos (ARASAAC) y la licencia bajo la que se distribuyen.
+      </p>
+
+      <div class="mt-6 p-4 bg-gray-50 rounded-2xl border-2 border-gray-300 font-mono text-xs md:text-sm text-gray-700">
+        <p class="font-bold uppercase text-gray-500 mb-1">Atribución Oficial Aplicada en el Sistema:</p>
+        "Autor pictogramas: Sergio Palao. Origen: ARASAAC (http://www.arasaac.org). Licencia: CC (BY-NC-SA). Propiedad: Gobierno de Aragón (España)"
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: LOGOS DE AGRADECIMIENTO E INSTITUCIONES -->
+  <section class="pt-6">
+    <h2 class="text-2xl font-black text-gray-700 mb-8">Instituciones Colaboradoras y Agradecimientos</h2>
+    
+    <!-- Grid Limpio de Logotipos de Alta Calidad -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 max-w-4xl mx-auto px-4 items-center">
+      
+      <!-- LOGO ESPOCH -->
+      <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center h-32 hover:scale-105 hover:shadow-xl transition-all duration-300">
+        <img src="/images/logos/LogoEspoch.png" alt="ESPOCH" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"/>
+        <span class="hidden font-black text-sm text-gray-400 tracking-wider">ESPOCH</span>
+      </div>
+
+      <!-- LOGO ARASAAC -->
+      <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center h-32 hover:scale-105 hover:shadow-xl transition-all duration-300">
+        <img src="/images/logos/logo_ARASAAC.png" alt="ARASAAC" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"/>
+        <span class="hidden font-black text-sm text-gray-400 tracking-wider">ARASAAC</span>
+      </div>
+
+      <!-- LOGO MI CIUDAD -->
+      <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center h-32 hover:scale-105 hover:shadow-xl transition-all duration-300">
+        <img src="/images/logos/el-coca.jpg" alt="Mi Ciudad" class="max-w-full max-h-full object-contain rounded-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"/>
+        <span class="hidden font-black text-sm text-gray-400 tracking-wider">MI CIUDAD</span>
+      </div>
+
+      <!-- LOGO ECUADOR -->
+      <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center h-32 hover:scale-105 hover:shadow-xl transition-all duration-300">
+        <img src="/images/logos/ecuadorlogo.png" alt="Ecuador" class="max-w-full max-h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"/>
+        <span class="hidden font-black text-sm text-gray-400 tracking-wider">ECUADOR</span>
+      </div>
+
+      <!-- LOGO ESCUELA MANUELA CAÑIZARES -->
+      <div class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center h-32 hover:scale-105 hover:shadow-xl transition-all duration-300 col-span-2 md:col-span-1 mx-auto md:mx-0 w-full max-w-[200px] md:max-w-none">
+        <img src="/images/logos/ueemc.jpg" alt="Escuela Especializada" class="max-w-full max-h-full object-contain rounded-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"/>
+        <span class="hidden font-black text-xs text-gray-400 tracking-tight text-center">ESCUELA ESPECIALIZADA</span>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="bg-gray-700 text-white/80 py-6 mt-12 rounded-t-3xl font-bold shadow-2xl">
+  © 2026 PictoVoz · Sistema de Comunicación Inclusiva
+</footer>
+
+<script type="module">
+  document.addEventListener("DOMContentLoaded", () => {
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    menuBtn.onclick = () => {
+      mobileMenu.classList.toggle("hidden");
+      mobileMenu.classList.toggle("flex");
+    };
+  });
+</script>
+</body>
+</html>
