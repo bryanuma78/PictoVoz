@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>PictoVoz</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- MEDIAPIPE -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+</head>
+
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden">
+
+<!-- NAVBAR RESPONSIVE -->
+<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+
+  <div class="flex justify-between items-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+
+      <img src="/images/pictovoz.png"
+      class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+
+      <span class="text-xl md:text-2xl">
+        PictoVoz
+      </span>
+
+    </div>
+
+    <!-- BOTON MENU MOBILE -->
+    <button id="menu-btn"
+    class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+
+      ☰
+
+    </button>
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:flex items-center gap-4 text-white">
+
+      <span id="bienvenida"
+      class="font-semibold">
+      </span>
+
+      <a href="/pages/menu/teclado-menu.html"
+      class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">
+
+        Menu
+
+      </a>
+
+      <button id="cerrar-sesion-btn"
+      class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+
+        Cerrar Sesión
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- MENU MOBILE -->
+  <div id="mobile-menu"
+  class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
+
+    <span id="bienvenida-mobile"
+    class="font-semibold text-center text-lg">
+    </span>
+
+    <a href="/pages/menu/teclado-menu.html"
+    class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">
+
+      📋 Menu
+
+    </a>
+
+    <button id="cerrar-sesion-btn-mobile"
+    class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
+
+      🚪 Cerrar Sesión
+
+    </button>
+
+  </div>
+
+</nav>
+
+<section class="mt-6 px-2 md:px-4">
+
+<h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">
+🧩 Teclado de Pictogramas
+</h2>
+
+<!-- CONTROLES -->
+<div class="mt-6 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
+
+<input id="input-busqueda"
+class="px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300"/>
+
+<button id="btn-agregar"
+class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">
+🔍 Buscar
+</button>
+
+<button id="btn-editar"
+class="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">
+✏️ Editar
+</button>
+
+<button id="btn-eliminar"
+class="bg-red-400 hover:bg-red-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">
+🗑️ Eliminar
+</button>
+
+<button id="btn-guardar"
+class="bg-purple-500 hover:bg-purple-600 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">
+💾 Guardar
+</button>
+
+<button id="btn-puntero"
+class="bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">
+🖱️ Desactivar Puntero
+</button>
+
+</div>
+
+<!-- MENSAJE -->
+<div id="mensaje-modo"
+class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto">
+</div>
+
+<!-- RESULTADOS -->
+<div id="resultados-busqueda"
+class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-6">
+</div>
+
+<!-- TECLADO -->
+<div id="contenedor-pictogramas"
+class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4 md:gap-6 mt-10 px-2">
+</div>
+
+</section>
+
+<!-- MODAL -->
+<div id="modal-eliminar"
+class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50 p-4">
+
+<div class="bg-white rounded-3xl p-6 shadow-2xl text-center w-full max-w-sm">
+
+<h3 class="text-xl font-bold mb-3">
+🗑️ ¿Eliminar pictograma?
+</h3>
+
+<p id="texto-modal"
+class="mb-5 text-gray-600">
+</p>
+
+<div class="flex justify-center gap-3">
+
+<button id="cancelar-eliminar"
+class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-xl font-bold">
+Cancelar
+</button>
+
+<button id="confirmar-eliminar"
+class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold">
+Eliminar
+</button>
+
+</div>
+</div>
+</div>
+
+<!-- CAMARA RESPONSIVE -->
+<div class="fixed top-20 left-2 md:left-4 z-40">
+
+  <div class="relative">
+
+    <video id="videoCam"
+      class="rounded-2xl border-4 border-green-400 shadow-2xl
+      w-28 h-24
+      sm:w-36 sm:h-28
+      md:w-44 md:h-32
+      object-cover bg-black"
+      autoplay
+      muted
+      playsinline>
+    </video>
+
+    <canvas id="canvasCam"
+      class="absolute top-0 left-0 w-full h-full pointer-events-none">
+    </canvas>
+
+  </div>
+
+</div>
+
+<!-- CURSOR -->
+<div id="cursorVirtual"
+class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75">
+</div>
+
+<script type="module">
+
+import { supabase } from '/pages/Login/supabase.js';
+
+/* ELEMENTOS */
+const bienvenida =
+document.getElementById('bienvenida');
+
+const bienvenidaMobile =
+document.getElementById('bienvenida-mobile');
+
+const cerrarBtn =
+document.getElementById('cerrar-sesion-btn');
+
+const cerrarBtnMobile =
+document.getElementById('cerrar-sesion-btn-mobile');
+
+const menuBtn =
+document.getElementById('menu-btn');
+
+const mobileMenu =
+document.getElementById('mobile-menu');
+
+const inputBusqueda = document.getElementById('input-busqueda');
+
+const btnAgregar = document.getElementById('btn-agregar');
+const btnEditar = document.getElementById('btn-editar');
+const btnEliminar = document.getElementById('btn-eliminar');
+const btnGuardar = document.getElementById('btn-guardar');
+
+const contenedor = document.getElementById('contenedor-pictogramas');
+const resultadosDiv = document.getElementById('resultados-busqueda');
+
+const mensajeModo = document.getElementById('mensaje-modo');
+
+const modal = document.getElementById('modal-eliminar');
+const textoModal = document.getElementById('texto-modal');
+
+const confirmarEliminar = document.getElementById('confirmar-eliminar');
+const cancelarEliminar = document.getElementById('cancelar-eliminar');
+
+const btnPuntero =
+document.getElementById('btn-puntero');
+
+/* VARIABLES */
+let userId = null;
+let modoActual = null;
+let pictogramas = [];
+let pictoAEliminar = null;
+let punteroActivo = true;
+
+/* PICTOS */
+const pictogramasDefecto = [
+
+{ palabra:"Hola", img:"/images/pictogramas/hola.png", fijo:true },
+
+{ palabra:"Comer", img:"/images/pictogramas/comer.png", fijo:true },
+
+{ palabra:"Beber", img:"/images/pictogramas/beber.png", fijo:true }
+
+];
+
+/* MENSAJE */
+function mostrarMensajeModo(texto, color){
+
+  mensajeModo.textContent = texto;
+
+  mensajeModo.className =
+  `mt-4 text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto ${color}`;
+
+  mensajeModo.classList.remove('hidden');
+
+  setTimeout(()=>{
+    mensajeModo.classList.add('hidden');
+  },2500);
+}
+
+/* USUARIO */
+async function mostrarUsuario(){
+
+  try{
+
+    const { data, error } = await supabase.auth.getUser();
+
+    if(error) throw error;
+
+    const user = data?.user;
+
+    if(user){
+
+      userId = user.id;
+
+      const nombre =
+      user.user_metadata?.full_name || user.email;
+       bienvenida.textContent =
+       `👋 ${nombre}`;
+       bienvenidaMobile.textContent =
+       `👋 ${nombre}`;
+
+      cargar();
+
+    }else{
+      location.href='/pages/Login/login.html';
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+    location.href='/pages/Login/login.html';
+  }
+}
+
+mostrarUsuario();
+
+/* LOGOUT */
+cerrarBtn.onclick = async ()=>{
+
+  await supabase.auth.signOut();
+
+  location.href='/pages/Login/login.html';
+};
+
+/* MENU MOBILE */
+menuBtn.onclick = ()=>{
+
+  mobileMenu.classList.toggle('hidden');
+
+  mobileMenu.classList.toggle('flex');
+};
+
+/* LOGOUT MOBILE */
+cerrarBtnMobile.onclick = async ()=>{
+
+  await supabase.auth.signOut();
+
+  location.href='/pages/Login/login.html';
+};
+/* CARGAR */
+async function cargar(){
+
+  const { data } = await supabase
+  .from('pictogramas_usuario')
+  .select('*')
+  .eq('user_id', userId);
+
+  pictogramas = [
+    ...pictogramasDefecto,
+    ...(data || [])
+  ];
+
+  renderizarPictogramas();
+}
+
+/* GUARDAR */
+async function guardarPictograma(p){
+
+  await supabase
+  .from('pictogramas_usuario')
+  .insert([
+    {
+      user_id:userId,
+      palabra:p.palabra,
+      img:p.img
+    }
+  ]);
+}
+
+/* ELIMINAR */
+async function eliminarPictogramaDB(p){
+
+  await supabase
+  .from('pictogramas_usuario')
+  .delete()
+  .eq('user_id', userId)
+  .eq('palabra', p.palabra);
+}
+
+/* RENDER */
+function renderizarPictogramas(){
+
+  contenedor.innerHTML='';
+
+  pictogramas.forEach((picto,index)=>{
+
+    const cont=document.createElement('div');
+
+    cont.className='flex flex-col items-center';
+
+    const div=document.createElement('div');
+
+    div.className='bg-white rounded-3xl shadow-lg hover:scale-110 transition p-2 md:p-4 cursor-pointer w-[85px] h-[85px] sm:w-[95px] sm:h-[95px] md:w-[110px] md:h-[110px] flex items-center justify-center border-4 border-green-200';
+
+    div.innerHTML=`
+      <img
+        src="${picto.img}"
+        class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px] object-contain pictograma-img">
+    `;
+
+    /* HABLAR */
+    if(!modoActual){
+
+      div.onclick=()=>{
+
+        speechSynthesis.cancel();
+
+        speechSynthesis.speak(
+          new SpeechSynthesisUtterance(
+            picto.palabra
+          )
+        );
+      };
+    }
+
+    /* ELIMINAR */
+    if(modoActual==='eliminar' && !picto.fijo){
+
+      div.onclick=()=>{
+
+        pictoAEliminar={picto,index};
+
+        textoModal.textContent=
+        `¿Eliminar "${picto.palabra}"?`;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
+    }
+
+    cont.appendChild(div);
+
+    /* EDITAR */
+    if(modoActual==='editar' && !picto.fijo){
+
+      const input=document.createElement('input');
+
+      input.value=picto.palabra;
+
+      input.className='mt-2 px-2 py-1 rounded-lg border-2 border-green-300 text-center w-[80px] md:w-[100px] text-sm';
+
+      input.onchange=async ()=>{
+
+        pictogramas[index].palabra=input.value;
+
+        await supabase
+        .from('pictogramas_usuario')
+        .update({
+          palabra:input.value
+        })
+        .eq('user_id',userId)
+        .eq('img',picto.img);
+      };
+
+      cont.appendChild(input);
+
+    }else{
+
+      const span=document.createElement('span');
+
+      span.className='mt-2 font-bold text-sm md:text-base';
+
+      span.textContent=picto.palabra;
+
+      cont.appendChild(span);
+    }
+
+    contenedor.appendChild(cont);
+
+  });
+}
+
+/* MODOS */
+btnEditar.onclick=()=>{
+
+  modoActual='editar';
+
+  renderizarPictogramas();
+
+  mostrarMensajeModo(
+  "✏️ Estás en modo editar",
+  "bg-yellow-500"
+  );
+};
+
+btnEliminar.onclick=()=>{
+
+  modoActual='eliminar';
+
+  renderizarPictogramas();
+
+  mostrarMensajeModo(
+  "🗑️ Estás en modo eliminar",
+  "bg-red-500"
+  );
+};
+
+btnGuardar.onclick=()=>{
+
+  modoActual=null;
+
+  renderizarPictogramas();
+
+  mostrarMensajeModo(
+  "✅ Cambios guardados",
+  "bg-green-500"
+  );
+};
+btnPuntero.onclick = ()=>{
+
+  punteroActivo = !punteroActivo;
+
+  if(punteroActivo){
+
+    cursorVirtual.style.display = "block";
+
+    videoElement.parentElement.style.display = "block";
+
+    btnPuntero.innerHTML =
+    "🖱️ Desactivar Puntero";
+
+    mostrarMensajeModo(
+    "✅ Puntero activado",
+    "bg-green-500"
+    );
+
+  }else{
+
+    cursorVirtual.style.display = "none";
+
+    videoElement.parentElement.style.display = "none";
+
+    btnPuntero.innerHTML =
+    "🖱️ Activar Puntero";
+
+    mostrarMensajeModo(
+    "⛔ Puntero desactivado",
+    "bg-red-500"
+    );
+  }
+};
+
+/* MODAL */
+cancelarEliminar.onclick=()=>{
+
+  modal.classList.add('hidden');
+};
+
+confirmarEliminar.onclick=async ()=>{
+
+  if(pictoAEliminar){
+
+    const {picto,index}=pictoAEliminar;
+
+    await eliminarPictogramaDB(picto);
+
+    pictogramas.splice(index,1);
+
+    renderizarPictogramas();
+  }
+
+  modal.classList.add('hidden');
+};
+
+/* BUSCAR */
+btnAgregar.onclick=async ()=>{
+
+  mostrarMensajeModo(
+  "🔍 Estás en modo buscar",
+  "bg-blue-500"
+  );
+
+  const termino=inputBusqueda.value.trim();
+
+  if(!termino) return;
+
+  const res=await fetch(
+  `https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(termino)}`
+  );
+
+  const data=await res.json();
+
+  resultadosDiv.innerHTML='';
+
+  data.slice(0,20).forEach(p=>{
+
+    const url=
+    `https://static.arasaac.org/pictograms/${p._id}/${p._id}_300.png`;
+
+    const img=document.createElement('img');
+
+    img.src=url;
+
+    img.className='w-full max-w-[100px] rounded-2xl cursor-pointer hover:scale-110 transition mx-auto';
+
+    img.onclick=async ()=>{
+
+      const nuevo={
+        palabra:termino,
+        img:url,
+        fijo:false
+      };
+
+      pictogramas.push(nuevo);
+
+      await guardarPictograma(nuevo);
+
+      modoActual=null;
+
+      renderizarPictogramas();
+
+      resultadosDiv.innerHTML='';
+
+      inputBusqueda.value='';
+    };
+
+    resultadosDiv.appendChild(img);
+  });
+};
+
+/* =========================================
+   CAMARA + ROSTRO
+========================================= */
+
+const videoElement =
+document.getElementById("videoCam");
+
+const canvasElement =
+document.getElementById("canvasCam");
+
+const canvasCtx =
+canvasElement.getContext("2d");
+
+const cursorVirtual =
+document.getElementById("cursorVirtual");
+
+/* VARIABLES */
+let rostroX = window.innerWidth / 2;
+let rostroY = window.innerHeight / 2;
+
+let suavizadoX = rostroX;
+let suavizadoY = rostroY;
+
+let ultimoElemento = null;
+let hoverInicio = 0;
+
+const TIEMPO_HOVER = 1200;
+const TIEMPO_COOLDOWN = 3000;
+
+const cooldownMap = new Map();
+
+/* DETECTOR */
+const faceMesh = new FaceMesh({
+
+  locateFile: (file)=>{
+    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+  }
+});
+
+faceMesh.setOptions({
+
+  maxNumFaces:1,
+
+  refineLandmarks:true,
+
+  minDetectionConfidence:0.6,
+
+  minTrackingConfidence:0.6
+});
+
+faceMesh.onResults(onResults);
+
+/* CAMARA */
+const camera = new Camera(videoElement, {
+
+  onFrame: async ()=>{
+
+    await faceMesh.send({
+      image: videoElement
+    });
+  },
+
+  width:640,
+  height:480
+});
+
+camera.start();
+
+/* RESULTADOS */
+function onResults(results){
+
+  canvasElement.width =
+  videoElement.videoWidth;
+
+  canvasElement.height =
+  videoElement.videoHeight;
+
+  canvasCtx.save();
+
+  canvasCtx.clearRect(
+  0,
+  0,
+  canvasElement.width,
+  canvasElement.height
+  );
+
+ if(results.multiFaceLandmarks.length > 0 && punteroActivo){
+
+    const landmarks =
+    results.multiFaceLandmarks[0];
+
+    /* NARIZ */
+    const nose = landmarks[1];
+
+    const x =
+    nose.x * canvasElement.width;
+
+    const y =
+    nose.y * canvasElement.height;
+
+    /* CUADRADO */
+    canvasCtx.strokeStyle="#00ff00";
+
+    canvasCtx.lineWidth=4;
+
+    canvasCtx.strokeRect(
+    x-40,
+    y-40,
+    80,
+    80
+    );
+
+    /* PUNTERO */
+    rostroX =
+    window.innerWidth -
+    (nose.x * window.innerWidth);
+
+    rostroY =
+    nose.y * window.innerHeight;
+
+    /* SUAVIZADO */
+    suavizadoX += (rostroX - suavizadoX) * 0.15;
+    suavizadoY += (rostroY - suavizadoY) * 0.15;
+
+    cursorVirtual.style.left =
+    `${suavizadoX}px`;
+
+    cursorVirtual.style.top =
+    `${suavizadoY}px`;
+
+    detectarHover();
+  }
+
+  canvasCtx.restore();
+}
+
+/* =========================================
+   HOVER INTELIGENTE
+========================================= */
+
+function detectarHover(){
+
+  const elemento =
+  document.elementFromPoint(
+  suavizadoX,
+  suavizadoY
+  );
+
+  if(!elemento) return;
+
+  const esPictograma =
+  elemento.tagName==="IMG" &&
+  elemento.closest("#contenedor-pictogramas");
+
+  if(!esPictograma){
+
+    ultimoElemento=null;
+
+    return;
+  }
+
+  /* MISMO ELEMENTO */
+  if(elemento===ultimoElemento){
+
+    if(Date.now() - hoverInicio > TIEMPO_HOVER){
+
+      ejecutarClick(elemento);
+
+      hoverInicio = Date.now() + 999999;
+    }
+
+  }else{
+
+    ultimoElemento = elemento;
+
+    hoverInicio = Date.now();
+  }
+}
+
+/* CLICK */
+function ejecutarClick(elemento){
+
+  const ahora = Date.now();
+
+  const ultimoClick =
+  cooldownMap.get(elemento) || 0;
+
+  /* ESPERA 20 SEGUNDOS */
+  if(ahora - ultimoClick < TIEMPO_COOLDOWN){
+    return;
+  }
+
+  cooldownMap.set(elemento, ahora);
+
+  /* EFECTO */
+  elemento.style.transform="scale(1.25)";
+  elemento.style.transition="0.2s";
+
+  setTimeout(()=>{
+    elemento.style.transform="";
+  },300);
+
+  elemento.click();
+}
+
+</script>
+
+</body>
+</html>

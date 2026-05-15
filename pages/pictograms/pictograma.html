@@ -1,321 +1,105 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PictoVoz</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PictoVoz</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MediaPipe para Tracking Facial -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-
-<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center">
-
-<!-- NAVBAR -->
-<nav class="flex justify-between items-center bg-gradient-to-r from-green-500 to-green-400 px-6 py-4 shadow-lg rounded-b-3xl">
-  <div class="flex items-center gap-3 text-white font-bold text-xl">
-    <img src="/images/pictovoz.png" 
-    class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md hover:scale-110 transition"/>
-    <span>PictoVoz</span>
-  </div>
-
-  <div class="flex items-center gap-4 text-white">
-    <span id="bienvenida" class="font-semibold"></span>
-
-    <a href="/pages/menu/teclado-menu.html" class="font-bold hover:underline">
-      Menu
-    </a>
-
-    <button id="cerrar-sesion-btn"
-      class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
-      Cerrar Sesión
-    </button>
-  </div>
-</nav>
-
-<section class="mt-6 px-4">
-
-<h2 class="text-3xl font-extrabold text-gray-700">🧩 Teclado de Pictogramas</h2>
-
-<!-- CONTROLES -->
-<div class="mt-6 flex flex-wrap justify-center gap-3">
-
-<input id="input-busqueda"
-class="px-4 py-3 rounded-2xl border-2 border-green-300 w-64 text-lg outline-none focus:ring-4 focus:ring-green-300"/>
-
-<button id="btn-agregar" class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold">🔍 Buscar</button>
-<button id="btn-editar" class="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-2xl text-white font-bold">✏️ Editar</button>
-<button id="btn-eliminar" class="bg-red-400 hover:bg-red-500 px-5 py-2 rounded-2xl text-white font-bold">🗑️ Eliminar</button>
-<button id="btn-guardar" class="bg-purple-500 hover:bg-purple-600 px-5 py-2 rounded-2xl text-white font-bold">💾 Guardar</button>
-
-</div>
-
-<!-- MENSAJE DE MODO -->
-<div id="mensaje-modo"
-class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto">
-</div>
-
-<!-- RESULTADOS -->
-<div id="resultados-busqueda"
-class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-4 max-w-4xl mx-auto mt-6"></div>
-
-<!-- TECLADO -->
-<div id="contenedor-pictogramas"
-class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-6 mt-10"></div>
-
-</section>
-
-<!-- MODAL -->
-<div id="modal-eliminar"
-class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50">
-
-<div class="bg-white rounded-3xl p-6 shadow-2xl text-center w-80">
-<h3 class="text-xl font-bold mb-3">🗑️ ¿Eliminar pictograma?</h3>
-<p id="texto-modal" class="mb-5 text-gray-600"></p>
-
-<div class="flex justify-center gap-3">
-<button id="cancelar-eliminar"
-class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-xl font-bold">
-Cancelar
-</button>
-
-<button id="confirmar-eliminar"
-class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold">
-Eliminar
-</button>
-</div>
-
-</div>
-</div>
-
-<script type="module">
-import { supabase } from '/pages/Login/supabase.js';
-
-const bienvenida = document.getElementById('bienvenida');
-const cerrarBtn = document.getElementById('cerrar-sesion-btn');
-const inputBusqueda = document.getElementById('input-busqueda');
-const btnAgregar = document.getElementById('btn-agregar');
-const btnEditar = document.getElementById('btn-editar');
-const btnEliminar = document.getElementById('btn-eliminar');
-const btnGuardar = document.getElementById('btn-guardar');
-const contenedor = document.getElementById('contenedor-pictogramas');
-const resultadosDiv = document.getElementById('resultados-busqueda');
-
-const mensajeModo = document.getElementById('mensaje-modo');
-
-const modal = document.getElementById('modal-eliminar');
-const textoModal = document.getElementById('texto-modal');
-const confirmarEliminar = document.getElementById('confirmar-eliminar');
-const cancelarEliminar = document.getElementById('cancelar-eliminar');
-
-let userId = null;
-let modoActual = null;
-let pictogramas = [];
-let pictoAEliminar = null;
-
-const pictogramasDefecto = [
-{ palabra:"Hola", img:"/images/pictogramas/hola.png", fijo:true },
-{ palabra:"Comer", img:"/images/pictogramas/comer.png", fijo:true },
-{ palabra:"Beber", img:"/images/pictogramas/beber.png", fijo:true }
-];
-
-/* MENSAJE */
-function mostrarMensajeModo(texto, color) {
-  mensajeModo.textContent = texto;
-
-  mensajeModo.className =
-    `mt-4 text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto ${color}`;
-
-  mensajeModo.classList.remove('hidden');
-
-  setTimeout(() => {
-    mensajeModo.classList.add('hidden');
-  }, 2500);
-}
-
-/* USUARIO */
-async function mostrarUsuario(){
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) throw error;
-
-    const user = data?.user;
-
-    if (user) {
-      userId = user.id;
-
-      const nombre = user.user_metadata?.full_name || user.email;
-
-      bienvenida.textContent = `👋 Bienvenido, ${nombre}`;
-
-      cargar();
-    } else {
-      location.href = '/pages/Login/login.html';
-    }
-
-  } catch (err) {
-    console.error(err);
-    location.href = '/pages/Login/login.html';
-  }
-}
-mostrarUsuario();
-
-/* LOGOUT */
-cerrarBtn.onclick = async ()=>{
-await supabase.auth.signOut();
-location.href='/pages/Login/login.html';
-};
-
-/* CARGAR */
-async function cargar(){
-const { data } = await supabase
-.from('pictogramas_usuario')
-.select('*')
-.eq('user_id', userId);
-
-pictogramas = [...pictogramasDefecto, ...(data||[])];
-renderizarPictogramas();
-}
-
-/* CRUD */
-async function guardarPictograma(p){
-await supabase.from('pictogramas_usuario')
-.insert([{user_id:userId, palabra:p.palabra, img:p.img}]);
-}
-
-async function eliminarPictogramaDB(p){
-await supabase.from('pictogramas_usuario')
-.delete()
-.eq('user_id', userId)
-.eq('palabra', p.palabra);
-}
-
-/* RENDER */
-function renderizarPictogramas(){
-contenedor.innerHTML='';
-
-pictogramas.forEach((picto,index)=>{
-
-const cont=document.createElement('div');
-cont.className='flex flex-col items-center';
-
-const div=document.createElement('div');
-div.className='bg-white rounded-3xl shadow-lg hover:scale-110 transition p-4 cursor-pointer w-[110px] h-[110px] flex items-center justify-center border-4 border-green-200';
-
-div.innerHTML=`<img src="${picto.img}" class="w-[80px] h-[80px] object-contain">`;
-
-if(!modoActual){
-div.onclick=()=>speechSynthesis.speak(new SpeechSynthesisUtterance(picto.palabra));
-}
-
-if(modoActual==='eliminar' && !picto.fijo){
-div.onclick=()=>{
-pictoAEliminar={picto,index};
-textoModal.textContent=`¿Eliminar "${picto.palabra}"?`;
-modal.classList.remove('hidden');
-modal.classList.add('flex');
-};
-}
-
-cont.appendChild(div);
-
-/* EDITAR */
-if(modoActual==='editar' && !picto.fijo){
-const input=document.createElement('input');
-input.value=picto.palabra;
-input.className='mt-2 px-2 py-1 rounded-lg border-2 border-green-300 text-center w-[100px]';
-
-input.onchange=async ()=>{
-pictogramas[index].palabra=input.value;
-
-await supabase
-.from('pictogramas_usuario')
-.update({palabra:input.value})
-.eq('user_id',userId)
-.eq('img',picto.img);
-};
-
-cont.appendChild(input);
-}else{
-const span=document.createElement('span');
-span.className='mt-2 font-bold';
-span.textContent=picto.palabra;
-cont.appendChild(span);
-}
-
-contenedor.appendChild(cont);
-
-});
-}
-
-/* MODOS */
-btnEditar.onclick=()=>{
-modoActual='editar';
-renderizarPictogramas();
-mostrarMensajeModo("✏️ Estás en modo editar", "bg-yellow-500");
-};
-
-btnEliminar.onclick=()=>{
-modoActual='eliminar';
-renderizarPictogramas();
-mostrarMensajeModo("🗑️ Estás en modo eliminar", "bg-red-500");
-};
-
-btnGuardar.onclick=()=>{
-modoActual=null;
-renderizarPictogramas();
-mostrarMensajeModo("✅ Cambios guardados", "bg-green-500");
-};
-
-/* MODAL */
-cancelarEliminar.onclick=()=>{
-modal.classList.add('hidden');
-};
-
-confirmarEliminar.onclick=async ()=>{
-if(pictoAEliminar){
-const {picto,index}=pictoAEliminar;
-
-await eliminarPictogramaDB(picto);
-pictogramas.splice(index,1);
-renderizarPictogramas();
-}
-
-modal.classList.add('hidden');
-};
-
-/* BUSCAR */
-btnAgregar.onclick=async ()=>{
-mostrarMensajeModo("🔍 Estás en modo buscar", "bg-blue-500");
-
-const termino=inputBusqueda.value.trim();
-if(!termino) return;
-
-const res=await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(termino)}`);
-const data=await res.json();
-
-resultadosDiv.innerHTML='';
-
-data.slice(0,20).forEach(p=>{
-const url=`https://static.arasaac.org/pictograms/${p._id}/${p._id}_300.png`;
-
-const img=document.createElement('img');
-img.src=url;
-img.className='w-[100px] rounded-2xl cursor-pointer hover:scale-110 transition';
-
-img.onclick=async ()=>{
-const nuevo={palabra:termino,img:url,fijo:false};
-pictogramas.push(nuevo);
-await guardarPictograma(nuevo);
-modoActual=null;
-renderizarPictogramas();
-resultadosDiv.innerHTML='';
-inputBusqueda.value='';
-};
-
-resultadosDiv.appendChild(img);
-});
-};
-</script>
-
+<body class="font-sans text-center overflow-x-hidden">
+
+    <!-- NAVBAR RESPONSIVE -->
+    <nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+        <div class="flex justify-between items-center">
+            
+            <!-- LOGO -->
+            <div class="flex items-center gap-3 text-white font-bold text-xl">
+                <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+                <span class="text-xl md:text-2xl">PictoVoz</span>
+            </div>
+
+            <!-- BOTON MENU MOBILE -->
+            <button id="menu-btn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+                ☰
+            </button>
+
+            <!-- MENU DESKTOP -->
+            <div class="hidden md:flex items-center gap-4 text-white">
+                <span id="bienvenida" class="font-semibold"></span>
+                <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menu</a>
+                <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- MENU MOBILE -->
+        <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
+            <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
+            <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">📋 Menu</a>
+            <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
+                🚪 Cerrar Sesión
+            </button>
+        </div>
+    </nav>
+
+    <!-- SECCIÓN PRINCIPAL -->
+    <section class="mt-6 px-2 md:px-4">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">🧩 Teclado de Pictogramas</h2>
+
+        <!-- CONTROLES Y ACCIONES -->
+        <div class="mt-6 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
+            <input id="input-busqueda" placeholder="Ej: Manzana" class="px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300"/>
+            <button id="btn-agregar" class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🔍 Buscar</button>
+            <button id="btn-editar" class="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">✏️ Editar</button>
+            <button id="btn-eliminar" class="bg-red-400 hover:bg-red-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🗑️ Eliminar</button>
+            <button id="btn-guardar" class="bg-purple-500 hover:bg-purple-600 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">💾 Guardar</button>
+            <button id="btn-puntero" class="bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🖱️ Desactivar Puntero</button>
+        </div>
+
+        <!-- NOTIFICACIONES DE MODO -->
+        <div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto"></div>
+
+        <!-- GALERÍA DE RESULTADOS API -->
+        <div id="resultados-busqueda" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-6"></div>
+
+        <!-- CONTENEDOR PRINCIPAL DE LIKES/PICTOGRAMAS -->
+        <div id="contenedor-pictogramas" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4 md:gap-6 mt-10 px-2"></div>
+    </section>
+
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR -->
+    <div id="modal-eliminar" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 shadow-2xl text-center w-full max-w-sm">
+            <h3 class="text-xl font-bold mb-3">🗑️ ¿Eliminar pictograma?</h3>
+            <p id="texto-modal" class="mb-5 text-gray-600"></p>
+            <div class="flex justify-center gap-3">
+                <button id="cancelar-eliminar" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-xl font-bold">Cancelar</button>
+                <button id="confirmar-eliminar" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEED DE CÁMARA FLOTANTE -->
+    <div class="fixed top-20 left-2 md:left-4 z-40">
+        <div class="relative">
+            <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black" autoplay muted playsinline></video>
+            <canvas id="canvasCam" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+        </div>
+    </div>
+
+    <!-- CURSOR VIRTUAL (SE MUEVE CON LA NARIZ) -->
+    <div id="cursorVirtual" class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75"></div>
+
+    <!-- Scripts de la Aplicación -->
+    <script type="module" src="./js/app.js"></script>
 </body>
 </html>

@@ -7,64 +7,94 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
 </head>
 
-<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen">
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden">
 
-<!-- ===== NAVBAR ===== -->
-<nav class="flex justify-between items-center bg-gradient-to-r from-green-500 to-green-400 px-6 py-4 shadow-lg rounded-b-3xl">
-  
-  <div class="flex items-center gap-3 text-white font-bold text-xl">
-    <img src="/images/pictovoz.png" 
-    class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md hover:scale-110 transition"/>
+<!-- NAVBAR RESPONSIVE -->
+<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+  <div class="flex justify-between items-center">
 
-    <span>PictoVoz</span>
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+      <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+      <span class="text-xl md:text-2xl">PictoVoz</span>
+    </div>
+
+    <!-- BOTON MENU MOBILE -->
+    <button id="menu-btn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+      ☰
+    </button>
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:flex items-center gap-4 text-white">
+      <span id="bienvenida" class="font-semibold"></span>
+      <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+        Cerrar Sesión
+      </button>
+    </div>
+
   </div>
 
-  <div class="flex items-center gap-4 text-white">
-    <span id="bienvenida" class="font-semibold hidden sm:block"></span>
-
-    <button id="cerrar-sesion-btn"
-      class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
-      Cerrar Sesión
+  <!-- MENU MOBILE -->
+  <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
+    <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
+    <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
+      🚪 Cerrar Sesión
     </button>
   </div>
 </nav>
 
+<!-- MENSAJE / POP-UP NOTIFICACIÓN -->
+<div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto"></div>
+
 <!-- ===== SELECCIÓN ===== -->
 <section class="mt-10 px-4">
 
-  <h2 class="text-3xl font-extrabold text-gray-700">
+  <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">
     🧩 Elige tu teclado
   </h2>
 
-  <p class="text-gray-600 mt-2">
-    Selecciona cómo quieres comunicarte
+  <p class="text-gray-600 mt-2 font-semibold">
+    Selecciona cómo quieres comunicarte o practicar
   </p>
 
-  <!-- OPCIONES -->
-  <div class="mt-10 flex flex-wrap justify-center gap-10">
+  <!-- OPCIONES RESPONSIVE GRIDS -->
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-4 pb-12">
 
-    <!-- OPCIÓN 1 -->
+    <!-- OPCIÓN: MINIJUEGO -->
+    <div onclick="window.location.href='/pages/minijuego/minijuego.html'"
+      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-purple-200">
+      <img src="/images/minijuego_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <span class="block text-lg font-black text-purple-600 uppercase">
+        🎮 Minijuego Pictogramas
+      </span>
+    </div>
+
+    <!-- OPCIÓN: LENGUA DE SEÑAS -->
     <div onclick="window.location.href='/pages/LS/Lenguaje_LS.html'"
-      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition w-64">
-
-      <img src="/images/TecladoLS_boton.png"
-        class="w-40 mx-auto mb-4 rounded-xl"/>
-
-      <span class="block text-lg font-bold text-gray-700">
+      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-blue-200">
+      <img src="/images/TecladoLS_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <span class="block text-lg font-black text-blue-500 uppercase">
         ✋ Teclado Lengua de Señas
       </span>
     </div>
 
-    <!-- OPCIÓN 2 -->
+    <!-- OPCIÓN: TECLADO TRADICIONAL -->
     <div onclick="window.location.href='/pages/pictograms/pictograma.html'"
-      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition w-64">
-
-      <img src="/images/pictograma_boton.png"
-        class="w-40 mx-auto mb-4 rounded-xl"/>
-
-      <span class="block text-lg font-bold text-gray-700">
+      class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-green-200">
+      <img src="/images/pictograma_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <span class="block text-lg font-black text-green-600 uppercase">
         🖼️ Teclado Pictogramas
       </span>
     </div>
@@ -77,9 +107,15 @@
 <script type="module">
   import { supabase } from '/pages/Login/supabase.js';
 
+  /* ELEMENTOS DOM */
   const bienvenida = document.getElementById('bienvenida');
+  const bienvenidaMobile = document.getElementById('bienvenida-mobile');
   const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+  const cerrarBtnMobile = document.getElementById('cerrar-sesion-btn-mobile');
+  const menuBtn = document.getElementById('menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
 
+  /* VALIDAR Y MOSTRAR USUARIO */
   async function mostrarUsuario() {
     try {
       const { data, error } = await supabase.auth.getUser();
@@ -88,8 +124,9 @@
       const user = data?.user;
 
       if (user) {
-        const nombre = user.user_metadata?.full_name ?? user.email;
+        const nombre = user.user_metadata?.full_name || user.email;
         bienvenida.textContent = `👋 Bienvenido, ${nombre}`;
+        bienvenidaMobile.textContent = `👋 Bienvenido, ${nombre}`;
       } else {
         window.location.href = '/pages/Login/login.html';
       }
@@ -102,17 +139,25 @@
 
   mostrarUsuario();
 
-  cerrarBtn.addEventListener('click', async () => {
-    const { error } = await supabase.auth.signOut();
+  /* NAVEGACIÓN MENÚ MÓVIL (HAMBURGUESA) */
+  menuBtn.onclick = () => {
+    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.toggle('flex');
+  };
 
+  /* EVENTOS DE CIERRE DE SESIÓN */
+  const cerrarSesion = async () => {
+    const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Error al cerrar sesión:', error.message);
       alert('No se pudo cerrar la sesión.');
       return;
     }
-
     window.location.href = '/pages/Login/login.html';
-  });
+  };
+
+  cerrarBtn.onclick = cerrarSesion;
+  cerrarBtnMobile.onclick = cerrarSesion;
 </script>
 
 </body>

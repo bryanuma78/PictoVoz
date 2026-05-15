@@ -4,63 +4,109 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PictoVoz - Teclado LS</title>
-  <link rel="stylesheet" href="/css/index/index.css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
 </head>
-<body>
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden">
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar">
-    <div class="nav-logo">
-      <img src="/images/pictovoz.png" alt="Logo PictoVoz">
-      <span>PictoVoz</span>
+<!-- NAVBAR RESPONSIVE -->
+<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+  <div class="flex justify-between items-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+      <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+      <span class="text-xl md:text-2xl">PictoVoz</span>
     </div>
-    <div class="nav-links">
-      <span id="bienvenida" style="color:white; margin-right:1rem;"></span>
-      <a href="/pages/menu/teclado-menu.html">Menu</a>
-      <button class="login-btn" id="cerrar-sesion-btn">Cerrar Sesión</button>
+
+    <!-- BOTON MENU MOBILE -->
+    <button id="menu-btn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+      ☰
+    </button>
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:flex items-center gap-4 text-white">
+      <span id="bienvenida" class="font-semibold"></span>
+      <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menu</a>
+      <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+        Cerrar Sesión
+      </button>
     </div>
-  </nav>
 
-  <!-- ===== SECCIÓN TECLADO LS ===== -->
-  <section id="teclado-ls">
-    <h2>🖐️ Teclado de Lengua de Señas</h2>
-    <p>Haz clic en las letras para formar tu palabra o frase:</p>
+  </div>
 
-    <!-- 🟦 CAMPO DE FRASE (ahora es TEXTAREA) -->
-    <div class="barra-texto">
-      <textarea id="campo-frase" placeholder="Tu frase aparecerá aquí..." readonly></textarea>
-      <button id="btn-voz" title="Reproducir 🔊">🔊</button>
+  <!-- MENU MOBILE -->
+  <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
+    <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
+    <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">📋 Menu</a>
+    <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
+      🚪 Cerrar Sesión
+    </button>
+  </div>
+</nav>
+
+<!-- ===== SECCIÓN TECLADO LS ===== -->
+<section class="mt-6 px-2 md:px-4 max-w-6xl mx-auto pb-12">
+    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">🖐️ Teclado de Lengua de Señas</h2>
+    <p class="text-gray-600 mt-2 font-semibold">Haz clic en las letras para formar tu palabra o frase:</p>
+
+    <!-- 🟦 CAMPO DE FRASE (TEXTAREA) -->
+    <div class="mt-6 max-w-2xl mx-auto flex gap-3 bg-white p-3 rounded-3xl border-4 border-green-200 shadow-lg items-center">
+      <textarea id="campo-frase" placeholder="Tu frase aparecerá aquí..." class="w-full text-lg font-medium px-3 py-2 outline-none resize-none overflow-hidden h-12 text-gray-700" readonly></textarea>
+      <button id="btn-voz" title="Reproducir 🔊" class="bg-blue-400 hover:bg-blue-500 text-white p-4 text-xl rounded-2xl transition shadow-md shrink-0">🔊</button>
     </div>
 
     <!-- 🟩 TECLADO + BOTONES LATERALES -->
-    <div class="teclado-con-controles">
-      <div class="contenedor-teclado">
-        <!-- Se generan las letras dinámicamente con JS -->
+    <div class="mt-8 flex flex-col lg:flex-row gap-6 justify-center items-start px-2">
+      
+      <!-- Contenedor Dinámico de Teclas -->
+      <div class="contenedor-teclado flex flex-col gap-3 w-full lg:max-w-4xl bg-white/40 backdrop-blur-sm p-4 rounded-3xl border-2 border-green-300 shadow-md">
+        <!-- Generado por JS -->
       </div>
 
-      <!-- Botones laterales -->
-      <div class="controles-laterales">
-        <button id="btn-espacio" class="btn-espacio">Espacio ␣</button>
-        <button id="btn-borrar-letra" class="btn-borrar-letra">← Borrar Letra</button>
-        <button id="btn-borrar" class="btn-borrar">🗑️ Borrar Todo</button>
+      <!-- Botones laterales / Controles -->
+      <div class="flex flex-row lg:flex-col gap-3 w-full lg:w-48 justify-center flex-wrap shrink-0">
+        <button id="btn-espacio" class="bg-blue-400 hover:bg-blue-500 px-5 py-4 rounded-2xl text-white font-bold shadow-md transition flex-1 lg:flex-none">Espacio ␣</button>
+        <button id="btn-borrar-letra" class="bg-yellow-400 hover:bg-yellow-500 px-5 py-4 rounded-2xl text-white font-bold shadow-md transition flex-1 lg:flex-none">← Borrar Letra</button>
+        <button id="btn-borrar" class="bg-red-400 hover:bg-red-500 px-5 py-4 rounded-2xl text-white font-bold shadow-md transition flex-1 lg:flex-none">🗑️ Borrar Todo</button>
       </div>
+
     </div>
-  </section>
+</section>
 
-  <script type="module">
+<!-- ===== SCRIPT ===== -->
+<script type="module">
     import { supabase } from '/pages/Login/supabase.js';
 
+    /* ELEMENTOS DOM */
     const bienvenida = document.getElementById('bienvenida');
+    const bienvenidaMobile = document.getElementById('bienvenida-mobile');
     const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+    const cerrarBtnMobile = document.getElementById('cerrar-sesion-btn-mobile');
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
 
+    /* AUTENTICACIÓN */
     async function mostrarUsuario() {
       try {
         const { data, error } = await supabase.auth.getUser();
         if (error) throw error;
         const user = data?.user;
         if (user) {
-          const nombre = user.user_metadata?.full_name ?? user.email;
-          bienvenida.textContent = `Bienvenido, ${nombre}`;
+          const nombre = user.user_metadata?.full_name || user.email;
+          bienvenida.textContent = `👋 ${nombre}`;
+          bienvenidaMobile.textContent = `👋 ${nombre}`;
         } else {
           window.location.href = '/pages/Login/login.html';
         }
@@ -71,7 +117,14 @@
     }
     mostrarUsuario();
 
-    cerrarBtn.addEventListener('click', async () => {
+    // Menú Hamburguesa
+    menuBtn.onclick = () => {
+      mobileMenu.classList.toggle('hidden');
+      mobileMenu.classList.toggle('flex');
+    };
+
+    // Logout
+    const cerrarSesion = async () => {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error al cerrar sesión:', error.message);
@@ -79,7 +132,9 @@
         return;
       }
       window.location.href = '/pages/Login/login.html';
-    });
+    };
+    cerrarBtn.onclick = cerrarSesion;
+    cerrarBtnMobile.onclick = cerrarSesion;
 
     /* ===== TECLADO DE SEÑAS QWERTY ===== */
     const filas = [
@@ -95,17 +150,21 @@
     const btnBorrarLetra = document.getElementById('btn-borrar-letra');
     const btnEspacio = document.getElementById('btn-espacio');
 
-    // Generar el teclado con filas tipo QWERTY
+    // Generar el teclado responsivo
     filas.forEach(fila => {
       const filaDiv = document.createElement('div');
-      filaDiv.classList.add('fila-teclado');
+      filaDiv.className = 'flex justify-center gap-1 sm:gap-2 w-full';
+      
       fila.forEach(letra => {
         const div = document.createElement('div');
-        div.classList.add('tecla');
+        // Estilos para teclas grandes y legibles para niños
+        div.className = 'bg-white rounded-xl sm:rounded-2xl border-2 border-green-200 shadow hover:scale-110 transition p-1 sm:p-2 cursor-pointer flex flex-col items-center justify-between w-[9%] aspect-[3/4] max-w-[80px] min-w-[32px]';
+        
         div.innerHTML = `
-          <img src="/images/LS/${letra}.jpg" alt="${letra}" />
-          <span>${letra}</span>
+          <img src="/images/LS/${letra}.jpg" alt="${letra}" class="w-full object-contain rounded-lg flex-1" />
+          <span class="font-black text-xs sm:text-base text-gray-700 mt-1 block">${letra}</span>
         `;
+        
         div.addEventListener('click', () => {
           campoFrase.value += letra;
           ajustarAltura(campoFrase);
@@ -119,6 +178,7 @@
     btnVoz.addEventListener('click', () => {
       const texto = campoFrase.value.trim();
       if (!texto) return;
+      speechSynthesis.cancel();
       const speech = new SpeechSynthesisUtterance(texto);
       speech.lang = 'es-ES';
       speech.rate = 1;
@@ -143,12 +203,12 @@
       ajustarAltura(campoFrase);
     });
 
-    // 🪄 Función para ajustar altura automáticamente
+    // Ajustar altura automáticamente de la barra de texto
     function ajustarAltura(textarea) {
       textarea.style.height = 'auto';
       textarea.style.height = textarea.scrollHeight + 'px';
     }
-  </script>
+</script>
 
 </body>
 </html>
