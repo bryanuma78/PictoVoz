@@ -42,8 +42,8 @@ let punteroActivo = true;
 
 const pictogramasDefecto = [
     { palabra: "Hola", img: "/images/pictogramas/hola.png", fijo: true },
-    { palabra: "Comer", img: "/images/pictogramas/comer.png", fijo: true },
-    { palabra: "Beber", img: "/images/pictogramas/beber.png", fijo: true }
+    { palabra: "Quiero Comer", img: "/images/pictogramas/comer.png", fijo: true },
+    { palabra: "Quiero Beber", img: "/images/pictogramas/beber.png", fijo: true }
 ];
 
 /* =========================================
