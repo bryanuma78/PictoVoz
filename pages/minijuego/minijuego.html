@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PictoVoz</title>
+    <title>PictoVoz - Minijuego</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -38,16 +38,16 @@
     </style>
 </head>
 
-<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden min-h-screen">
+<body id="body-context" class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden min-h-screen transition-colors duration-300">
 
-<!-- NAVBAR RESPONSIVE -->
-<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+<!-- NAVBAR RESPONSIVE (Control dinámico por IDs) -->
+<nav id="navbar-context" class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300">
   <div class="flex justify-between items-center">
 
     <!-- LOGO -->
     <div class="flex items-center gap-3 text-white font-bold text-xl">
       <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
-      <span class="text-xl md:text-2xl">PictoVoz</span>
+      <span id="lblBrandName" class="text-xl md:text-2xl">PictoVoz</span>
     </div>
 
     <!-- BOTON MENU MOBILE -->
@@ -57,8 +57,8 @@
 
     <!-- MENU DESKTOP -->
     <div class="hidden md:flex items-center gap-4 text-white">
-      <span id="bienvenida" class="font-semibold"></span>
-      <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menu</a>
+      <span id="bienvenida" class="font-black text-sm md:text-base tracking-wide">Cargando perfil...</span>
+      <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menú</a>
       <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
         Cerrar Sesión
       </button>
@@ -68,10 +68,8 @@
 
   <!-- MENU MOBILE -->
   <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
-    <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
-    <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">
-      Menu
-    </a>
+    <span id="bienvenida-mobile" class="font-bold text-center text-lg">Cargando perfil...</span>
+    <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition text-center">Menú</a>
     <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
       Cerrar Sesión
     </button>
@@ -82,17 +80,17 @@
 <section class="mt-6 px-2 md:px-4">
     <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">MINIJUEGO DE PICTOGRAMAS</h2>
 
-    <!-- CONTROLES -->
+    <!-- CONTROLES (Bordes dinámicos controlados por ID) -->
     <div class="mt-6 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
-        <input id="input-busqueda" placeholder="Ej: Manzana" class="px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300"/>
-        <button id="btn-agregar" class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🔍 Buscar</button>
-        <button id="btn-editar" class="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">✏️ Editar</button>
-        <button id="btn-eliminar" class="bg-red-400 hover:bg-red-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🗑️ Eliminar</button>
-        <button id="btn-guardar" class="bg-purple-500 hover:bg-purple-600 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">💾 Guardar</button>
-        <button id="btn-puntero" class="bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto">🖱️ Desactivar Puntero</button>
+        <input id="input-busqueda" placeholder="Ej: Manzana" class="px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300"/>
+        <button id="btn-agregar" class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">🔍 Buscar</button>
+        <button id="btn-editar" class="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">✏️ Editar</button>
+        <button id="btn-eliminar" class="bg-red-400 hover:bg-red-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">🗑️ Eliminar</button>
+        <button id="btn-guardar" class="bg-purple-500 hover:bg-purple-600 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">💾 Guardar</button>
+        <button id="btn-puntero" class="bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">🖱️ Desactivar Puntero</button>
     </div>
 
-    <!-- MENSAJE -->
+    <!-- MENSAJE TOAST -->
     <div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto"></div>
 
     <!-- RESULTADOS -->
@@ -104,13 +102,13 @@
 
 <!-- SECCIÓN DEL MINIJUEGO INTERACTIVO -->
 <section id="seccion-juego" class="mt-16 mx-auto max-w-4xl px-4 pb-16">
-    <div class="bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300">
-        <h2 class="text-3xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender!</h2>
+    <div id="card-juego" class="bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300">
+        <h2 id="title-juego" class="text-xl sm:text-3xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender!</h2>
         <p class="text-gray-600 mb-6 font-semibold">Practica el uso del puntero seleccionando el pictograma correcto</p>
 
         <!-- PANTALLA DE INICIO -->
         <div id="juego-inicio" class="py-6">
-            <button id="btn-iniciar-juego" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-105 text-white font-black text-2xl px-12 py-5 rounded-3xl shadow-lg transition-all">
+            <button id="btn-iniciar-juego" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-105 text-white font-black text-xl sm:text-2xl px-12 py-5 rounded-3xl shadow-lg transition-all">
                 🚀 ¡Empezar Juego!
             </button>
         </div>
@@ -118,8 +116,8 @@
         <!-- PANTALLA PRINCIPAL DEL JUEGO (OCULTA AL INICIO) -->
         <div id="juego-pantalla" class="hidden animate-fade-in">
             <!-- PREGUNTA -->
-            <div class="bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm">
-                <h3 class="text-2xl md:text-3xl font-black text-purple-800">
+            <div id="bg-pregunta" class="bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300">
+                <h3 class="text-xl md:text-3xl font-black text-purple-800">
                     ¿Cuál es el pictograma de: <span id="juego-pregunta" class="text-blue-600 underline">...</span>?
                 </h3>
             </div>
@@ -154,7 +152,7 @@
 <!-- CAMARA RESPONSIVE -->
 <div class="fixed top-20 left-2 md:left-4 z-40">
   <div class="relative">
-    <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black" autoplay muted playsinline></video>
+    <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300" autoplay muted playsinline></video>
     <canvas id="canvasCam" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
   </div>
 </div>
@@ -162,12 +160,21 @@
 <!-- CURSOR VIRTUAL -->
 <div id="cursorVirtual" class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75"></div>
 
-<!-- LÓGICA JAVASCRIPT -->
+<!-- LÓGICA JAVASCRIPT INTEGRADA -->
 <script type="module">
-
 import { supabase } from '/pages/Login/supabase.js';
 
-/* ELEMENTOS DOM */
+/* ELEMENTOS DEL CONTEXTO DINÁMICO */
+const bodyContext = document.getElementById('body-context');
+const navbarContext = document.getElementById('navbar-context');
+const lblBrandName = document.getElementById('lblBrandName');
+const inputBusqueda = document.getElementById('input-busqueda');
+const cardJuego = document.getElementById('card-juego');
+const titleJuego = document.getElementById('title-juego');
+const bgPregunta = document.getElementById('bg-pregunta');
+const videoCam = document.getElementById('videoCam');
+
+/* ELEMENTOS DOM GENERALES */
 const bienvenida = document.getElementById('bienvenida');
 const bienvenidaMobile = document.getElementById('bienvenida-mobile');
 const cerrarBtn = document.getElementById('cerrar-sesion-btn');
@@ -175,7 +182,6 @@ const cerrarBtnMobile = document.getElementById('cerrar-sesion-btn-mobile');
 const menuBtn = document.getElementById('menu-btn');
 const mobileMenu = document.getElementById('mobile-menu');
 
-const inputBusqueda = document.getElementById('input-busqueda');
 const btnAgregar = document.getElementById('btn-agregar');
 const btnEditar = document.getElementById('btn-editar');
 const btnEliminar = document.getElementById('btn-eliminar');
@@ -207,6 +213,7 @@ let modoActual = null;
 let pictogramas = [];
 let pictoAEliminar = null;
 let punteroActivo = true;
+let isInstitucional = false;
 
 let juegoActivo = false;
 let opcionCorrecta = null;
@@ -230,47 +237,81 @@ function mostrarMensajeModo(texto, color){
   },2500);
 }
 
-/* CONTROL DE USUARIO */
-async function mostrarUsuario(){
-  try{
-    const { data, error } = await supabase.auth.getUser();
-    if(error) throw error;
-    const user = data?.user;
+/* CONTROL DE USUARIO & AUTENTICACIÓN HÍBRIDA */
+async function inicializarAutenticacionYEstilos() {
+  const cedulaInstitucional = localStorage.getItem("user_cedula");
 
-    if(user){
-      userId = user.id;
-      const nombre = user.user_metadata?.full_name || user.email;
-      bienvenida.textContent = `${nombre}`;
-      bienvenidaMobile.textContent = `${nombre}`;
-      cargar();
-    }else{
+  if (cedulaInstitucional) {
+    // --- ADAPTACIÓN MODO INSTITUCIONAL ---
+    isInstitucional = true;
+    bodyContext.className = "font-sans bg-gradient-to-b from-blue-100 to-indigo-100 text-center overflow-x-hidden min-h-screen transition-colors duration-300";
+    navbarContext.className = "bg-gradient-to-r from-blue-600 to-blue-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+    lblBrandName.textContent = "PictoVoz Institucional";
+    inputBusqueda.className = "px-4 py-3 rounded-2xl border-2 border-blue-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300";
+    cardJuego.className = "bg-white rounded-3xl shadow-2xl p-6 border-4 border-blue-300 transition-all duration-300";
+    titleJuego.className = "text-xl sm:text-3xl font-extrabold text-blue-600 mb-2";
+    bgPregunta.className = "bg-blue-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300";
+    videoCam.className = "rounded-2xl border-4 border-blue-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300";
+
+    try {
+      // Consultar tabla relacional en Postgres vía cédula
+      const { data: usuario, error } = await supabase
+        .from('personal_institucional')
+        .select('nombre')
+        .eq('cedula', cedulaInstitucional)
+        .single();
+
+      if (error || !usuario) throw new Error("Cédula no válida en el sistema");
+
+      bienvenida.textContent = `Bienvenido, ${usuario.nombre}`;
+      bienvenidaMobile.textContent = `Bienvenido, ${usuario.nombre}`;
+      
+      // En entorno institucional usamos una clave unificada o dummy para simular el scope del usuario en pictogramas
+      userId = cedulaInstitucional; 
+      await cargar();
+
+    } catch (err) {
+      console.error('Error institucional:', err.message);
+      localStorage.removeItem("user_cedula");
+      location.href = '/pages/Login/login.html';
+    }
+
+  } else {
+    // --- ADAPTACIÓN MODO PÚBLICO (GOOGLE) ---
+    isInstitucional = false;
+    bodyContext.className = "font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden min-h-screen transition-colors duration-300";
+    navbarContext.className = "bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+    lblBrandName.textContent = "PictoVoz";
+    inputBusqueda.className = "px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300";
+    cardJuego.className = "bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300";
+    titleJuego.className = "text-xl sm:text-3xl font-extrabold text-purple-600 mb-2";
+    bgPregunta.className = "bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300";
+    videoCam.className = "rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300";
+
+    try{
+      const { data, error } = await supabase.auth.getUser();
+      if(error) throw error;
+      const user = data?.user;
+
+      if(user){
+        userId = user.id;
+        const nombre = user.user_metadata?.full_name || user.email;
+        bienvenida.textContent = `Bienvenido, ${nombre}`;
+        bienvenidaMobile.textContent = `Bienvenido, ${nombre}`;
+        await cargar();
+      }else{
+        location.href='/pages/Login/login.html';
+      }
+    }catch(err){
+      console.error(err);
       location.href='/pages/Login/login.html';
     }
-  }catch(err){
-    console.error(err);
-    location.href='/pages/Login/login.html';
   }
 }
-mostrarUsuario();
-
-/* LOGOUTS */
-cerrarBtn.onclick = async ()=>{
-  await supabase.auth.signOut();
-  location.href='/pages/Login/login.html';
-};
-
-cerrarBtnMobile.onclick = async ()=>{
-  await supabase.auth.signOut();
-  location.href='/pages/Login/login.html';
-};
-
-menuBtn.onclick = ()=>{
-  mobileMenu.classList.toggle('hidden');
-  mobileMenu.classList.toggle('flex');
-};
 
 /* SUPABASE - OPERACIONES BASE DE DATOS */
 async function cargar(){
+  // Si es institucional, filtramos opcionalmente por cédula como identificador de perfil
   const { data } = await supabase
     .from('pictogramas_usuario')
     .select('*')
@@ -296,12 +337,15 @@ async function eliminarPictogramaDB(p){
 /* RENDERIZADO DEL TECLADO */
 function renderizarPictogramas(){
   contenedor.innerHTML='';
+  const claseBorde = isInstitucional ? 'border-blue-200' : 'border-green-200';
+  const claseBordeInput = isInstitucional ? 'border-blue-300 font-medium' : 'border-green-300';
+  
   pictogramas.forEach((picto,index)=>{
     const cont=document.createElement('div');
     cont.className='flex flex-col items-center';
 
     const div=document.createElement('div');
-    div.className='bg-white rounded-3xl shadow-lg hover:scale-110 transition p-2 md:p-4 cursor-pointer w-[85px] h-[85px] sm:w-[95px] sm:h-[95px] md:w-[110px] md:h-[110px] flex items-center justify-center border-4 border-green-200';
+    div.className=`bg-white rounded-3xl shadow-lg hover:scale-110 transition p-2 md:p-4 cursor-pointer w-[85px] h-[85px] sm:w-[95px] sm:h-[95px] md:w-[110px] md:h-[110px] flex items-center justify-center border-4 ${claseBorde}`;
     div.innerHTML=`<img src="${picto.img}" class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] md:w-[80px] md:h-[80px] object-contain pictograma-img">`;
 
     if(!modoActual){
@@ -325,7 +369,7 @@ function renderizarPictogramas(){
     if(modoActual==='editar' && !picto.fijo){
       const input=document.createElement('input');
       input.value=picto.palabra;
-      input.className='mt-2 px-2 py-1 rounded-lg border-2 border-green-300 text-center w-[80px] md:w-[100px] text-sm';
+      input.className=`mt-2 px-2 py-1 rounded-lg border-2 ${claseBordeInput} text-center w-[80px] md:w-[100px] text-sm`;
       input.onchange=async ()=>{
         pictogramas[index].palabra=input.value;
         await supabase.from('pictogramas_usuario').update({ palabra:input.value }).eq('user_id',userId).eq('img',picto.img);
@@ -333,13 +377,27 @@ function renderizarPictogramas(){
       cont.appendChild(input);
     }else{
       const span=document.createElement('span');
-      span.className='mt-2 font-bold text-sm md:text-base';
+      span.className='mt-2 font-bold text-sm md:text-base text-gray-700';
       span.textContent=picto.palabra;
       cont.appendChild(span);
     }
     contenedor.appendChild(cont);
   });
 }
+
+/* LOGOUT UNIFICADO */
+const cerrarSesion = async () => {
+  localStorage.removeItem("user_cedula");
+  await supabase.auth.signOut();
+  location.href='/pages/Login/login.html';
+};
+cerrarBtn.onclick = cerrarSesion;
+cerrarBtnMobile.onclick = cerrarSesion;
+
+menuBtn.onclick = ()=>{
+  mobileMenu.classList.toggle('hidden');
+  mobileMenu.classList.toggle('flex');
+};
 
 /* ACCIONES DE INTERFAZ DEL TECLADO */
 btnEditar.onclick=()=>{
@@ -434,22 +492,20 @@ function generarNuevaRonda() {
     juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8";
     juegoOpcionesDiv.innerHTML = "";
 
-    // Clonar y desordenar lista de pictogramas
     const poolBarajado = [...pictogramas].sort(() => 0.5 - Math.random());
     const seleccionadas = poolBarajado.slice(0, 3);
 
-    // Definir la respuesta correcta
     opcionCorrecta = seleccionadas[Math.floor(Math.random() * seleccionadas.length)];
     juegoPreguntaSpan.textContent = opcionCorrecta.palabra.toUpperCase();
 
-    // Locución asistida
     speechSynthesis.cancel();
     speechSynthesis.speak(new SpeechSynthesisUtterance(`¿Cuál es el pictograma de: ${opcionCorrecta.palabra}?`));
 
-    // Renderizar opciones en pantalla
+    const claseBordeCard = isInstitucional ? 'border-blue-200' : 'border-purple-200';
+
     seleccionadas.forEach(picto => {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-3xl shadow-xl hover:scale-105 border-4 border-purple-200 p-4 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[160px] mx-auto';
+        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-4 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[160px] mx-auto`;
         card.innerHTML = `<img src="${picto.img}" data-palabra="${picto.palabra}" class="w-[85%] h-[85%] object-contain pictograma-img">`;
         
         card.onclick = () => verificarRespuesta(picto.palabra, card);
@@ -469,7 +525,7 @@ function verificarRespuesta(palabraSeleccionada, elementoCard) {
 
         elementoCard.classList.add('animacion-correcto');
         juegoFeedbackDiv.textContent = "🌟 ¡Excelente! ¡Lo lograste! 🎉";
-        juegoFeedbackDiv.classList.add('text-green-500');
+        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-green-500 animate-fade-in";
         speechSynthesis.speak(new SpeechSynthesisUtterance("¡Excelente! ¡Lo lograste!"));
 
         juegoActivo = false;
@@ -483,7 +539,7 @@ function verificarRespuesta(palabraSeleccionada, elementoCard) {
 
         elementoCard.classList.add('animacion-incorrecto');
         juegoFeedbackDiv.textContent = "💪 Inténtalo otra vez, ¡tú puedes!";
-        juegoFeedbackDiv.classList.add('text-orange-500');
+        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-orange-500 animate-fade-in";
         speechSynthesis.speak(new SpeechSynthesisUtterance("Inténtalo otra vez, ¡tú puedes!"));
 
         setTimeout(() => {
@@ -546,7 +602,8 @@ function onResults(results){
     const x = nose.x * canvasElement.width;
     const y = nose.y * canvasElement.height;
 
-    canvasCtx.strokeStyle="#00ff00";
+    // Adaptar color del recuadro del tracker de la cámara según el entorno
+    canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00";
     canvasCtx.lineWidth=4;
     canvasCtx.strokeRect(x-40, y-40, 80, 80);
 
@@ -559,6 +616,15 @@ function onResults(results){
     cursorVirtual.style.left = `${suavizadoX}px`;
     cursorVirtual.style.top = `${suavizadoY}px`;
 
+    // Cambiar el color del cursor virtual si es institucional
+    if(isInstitucional) {
+      cursorVirtual.classList.remove("bg-green-500");
+      cursorVirtual.classList.add("bg-blue-500");
+    } else {
+      cursorVirtual.classList.remove("bg-blue-500");
+      cursorVirtual.classList.add("bg-green-500");
+    }
+
     detectarHover();
   }
   canvasCtx.restore();
@@ -569,7 +635,6 @@ function detectarHover(){
   const elemento = document.elementFromPoint(suavizadoX, suavizadoY);
   if(!elemento) return;
 
-  // Ajustado para capturar tanto los elementos del teclado como del juego de forma transparente
   const esPictograma = elemento.tagName==="IMG" && 
                        (elemento.closest("#contenedor-pictogramas") || elemento.closest("#juego-opciones"));
 
@@ -605,6 +670,9 @@ function ejecutarClick(elemento){
 
   elemento.click();
 }
+
+// Inicializar el guardrail de autenticación y los contextos gráficos
+inicializarAutenticacionYEstilos();
 
 </script>
 </body>

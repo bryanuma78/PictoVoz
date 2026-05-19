@@ -19,16 +19,16 @@
   </style>
 </head>
 
-<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden">
+<body id="body-context" class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden transition-colors duration-300">
 
-<!-- NAVBAR RESPONSIVE -->
-<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+<!-- NAVBAR RESPONSIVE (Colores dinámicos controlados por ID) -->
+<nav id="navbar-context" class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300">
   <div class="flex justify-between items-center">
 
     <!-- LOGO -->
     <div class="flex items-center gap-3 text-white font-bold text-xl">
       <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
-      <span class="text-xl md:text-2xl">PictoVoz</span>
+      <span id="lblBrandName" class="text-xl md:text-2xl">PictoVoz</span>
     </div>
 
     <!-- BOTON MENU MOBILE -->
@@ -38,7 +38,7 @@
 
     <!-- MENU DESKTOP -->
     <div class="hidden md:flex items-center gap-4 text-white">
-      <span id="bienvenida" class="font-semibold"></span>
+      <span id="bienvenida" class="font-black text-sm md:text-base tracking-wide">Cargando perfil...</span>
       <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
         Cerrar Sesión
       </button>
@@ -48,15 +48,15 @@
 
   <!-- MENU MOBILE -->
   <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
-    <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
+    <span id="bienvenida-mobile" class="font-bold text-center text-lg">Cargando perfil...</span>
     <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
       Cerrar Sesión
     </button>
   </div>
 </nav>
 
-<!-- MENSAJE / POP-UP NOTIFICACIÓN -->
-<div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto"></div>
+<!-- MENSAJE / POP-UP NOTIFICACIÓN (Muestra el rol asignado si es institucional) -->
+<div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-5 py-2.5 rounded-2xl shadow-md max-w-md mx-auto animate-fade-in"></div>
 
 <!-- ===== SELECCIÓN ===== -->
 <section class="mt-10 px-4">
@@ -75,7 +75,7 @@
     <!-- OPCIÓN: MINIJUEGO -->
     <div onclick="window.location.href='/pages/minijuego/minijuego.html'"
       class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-purple-200">
-      <img src="/images/menu/minijuego_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <img src="/images/menu/minijuego_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl" onerror="this.src='https://placehold.co/160'"/>
       <span class="block text-lg font-black text-purple-600 uppercase">
         Minijuego Pictogramas
       </span>
@@ -84,7 +84,7 @@
     <!-- OPCIÓN: LENGUA DE SEÑAS -->
     <div onclick="window.location.href='/pages/LS/Lenguaje_LS.html'"
       class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-blue-200">
-      <img src="/images/menu/TecladoLS_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <img src="/images/menu/TecladoLS_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl" onerror="this.src='https://placehold.co/160'"/>
       <span class="block text-lg font-black text-blue-500 uppercase">
         Teclado Lengua de Señas
       </span>
@@ -93,7 +93,7 @@
     <!-- OPCIÓN: TECLADO TRADICIONAL -->
     <div onclick="window.location.href='/pages/pictograms/pictograma.html'"
       class="bg-white rounded-3xl shadow-xl p-6 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between items-center border-4 border-green-200">
-      <img src="/images/menu/pictograma_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl"/>
+      <img src="/images/menu/pictograma_boton.png" class="w-40 h-40 object-contain mx-auto mb-4 rounded-xl" onerror="this.src='https://placehold.co/160'"/>
       <span class="block text-lg font-black text-green-600 uppercase">
         Teclado Pictogramas
       </span>
@@ -103,9 +103,15 @@
 
 </section>
 
-<!-- ===== SCRIPT ===== -->
+<!-- ===== SCRIPT DE ADAPTACIÓN INTELIGENTE ===== -->
 <script type="module">
   import { supabase } from '/pages/Login/supabase.js';
+
+  /* ELEMENTOS DEL CONTEXTO CROMÁTICO */
+  const bodyContext = document.getElementById('body-context');
+  const navbarContext = document.getElementById('navbar-context');
+  const lblBrandName = document.getElementById('lblBrandName');
+  const mensajeModo = document.getElementById('mensaje-modo');
 
   /* ELEMENTOS DOM */
   const bienvenida = document.getElementById('bienvenida');
@@ -115,29 +121,75 @@
   const menuBtn = document.getElementById('menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
 
-  /* VALIDAR Y MOSTRAR USUARIO */
-  async function mostrarUsuario() {
-    try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
+  /* VALIDAR ENTORNO Y CARGAR DATOS */
+  async function verificarYMostrarPerfil() {
+    // 1. Revisar si hay una sesión por Cédula (Flujo Institucional)
+    const cedulaInstitucional = localStorage.getItem("user_cedula");
 
-      const user = data?.user;
+    if (cedulaInstitucional) {
+      // --- INTERFAZ MODO INSTITUCIONAL ---
+      // Adaptar colores del fondo de pantalla y navbar
+      bodyContext.className = "font-sans bg-gradient-to-b from-blue-100 to-indigo-100 text-center min-h-screen overflow-x-hidden";
+      navbarContext.className = "bg-gradient-to-r from-blue-600 to-blue-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+      lblBrandName.textContent = "PictoVoz Institucional";
 
-      if (user) {
-        const nombre = user.user_metadata?.full_name || user.email;
-        bienvenida.textContent = `Bienvenido, ${nombre}`;
-        bienvenidaMobile.textContent = `Bienvenido, ${nombre}`;
-      } else {
-        window.location.href = '/pages/Login/login.html';
+      try {
+        // Consultar el nombre y el rol en PostgreSQL usando la cédula guardada
+        const { data: usuario, error } = await supabase
+          .from('personal_institucional')
+          .select('nombre, rol')
+          .eq('cedula', cedulaInstitucional)
+          .single();
+
+        if (error || !usuario) throw new Error("No se encontró el registro de la cédula");
+
+        // Pintar la bienvenida institucional solicitada
+        const mensajeBienvenida = `Bienvenido, ${usuario.nombre}`;
+        bienvenida.textContent = mensajeBienvenida;
+        bienvenidaMobile.textContent = mensajeBienvenida;
+
+        // Mostrar una pequeña etiqueta flotante con su Rol asignado
+        mensajeModo.className = "mt-4 text-white font-black px-5 py-2 rounded-xl shadow-md max-w-sm mx-auto bg-blue-600 block text-xs uppercase tracking-wider";
+        mensajeModo.textContent = `Perfil Activo: Rol ${usuario.rol}`;
+
+      } catch (err) {
+        console.error('Error al mapear cédula institucional:', err.message);
+        localStorage.removeItem("user_cedula");
+        window.location.href = '/pages intitucional/login/institucional.html';
       }
 
-    } catch (err) {
-      console.error('Error al obtener el usuario:', err.message);
-      window.location.href = '/pages/Login/login.html';
+    } else {
+      // --- INTERFAZ MODO PÚBLICO (GOOGLE / CORREO TRADICIONAL) ---
+      bodyContext.className = "font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden";
+      navbarContext.className = "bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+      lblBrandName.textContent = "PictoVoz";
+
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+
+        const user = data?.user;
+
+        if (user) {
+          const nombre = user.user_metadata?.full_name || user.email;
+          bienvenida.textContent = `Bienvenido, ${nombre}`;
+          bienvenidaMobile.textContent = `Bienvenido, ${nombre}`;
+          
+          mensajeModo.className = "mt-4 text-white font-black px-5 py-2 rounded-xl shadow-md max-w-sm mx-auto bg-emerald-600 block text-xs uppercase tracking-wider";
+          mensajeModo.textContent = "Acceso Público Global";
+        } else {
+          window.location.href = '/pages/Login/login.html';
+        }
+
+      } catch (err) {
+        console.error('Error al obtener usuario de sesión pública:', err.message);
+        window.location.href = '/pages/Login/login.html';
+      }
     }
   }
 
-  mostrarUsuario();
+  // Ejecutar verificación de entorno al cargar la página
+  verificarYMostrarPerfil();
 
   /* NAVEGACIÓN MENÚ MÓVIL (HAMBURGUESA) */
   menuBtn.onclick = () => {
@@ -145,19 +197,18 @@
     mobileMenu.classList.toggle('flex');
   };
 
-  /* EVENTOS DE CIERRE DE SESIÓN */
-  const cerrarSesion = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error al cerrar sesión:', error.message);
-      alert('No se pudo cerrar la sesión.');
-      return;
-    }
+  /* EVENTOS DE CIERRE DE SESIÓN LIMPIO */
+  const procesarCierreSesion = async () => {
+    // Limpiar tanto el estado nativo de Supabase como la cookie de la cédula institucional
+    localStorage.removeItem("user_cedula");
+    await supabase.auth.signOut();
+    
+    // Mandar al Login General por defecto
     window.location.href = '/pages/Login/login.html';
   };
 
-  cerrarBtn.onclick = cerrarSesion;
-  cerrarBtnMobile.onclick = cerrarSesion;
+  cerrarBtn.onclick = procesarCierreSesion;
+  cerrarBtnMobile.onclick = procesarCierreSesion;
 </script>
 
 </body>

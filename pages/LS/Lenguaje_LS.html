@@ -18,16 +18,16 @@
     }
   </style>
 </head>
-<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden">
+<body id="body-context" class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden transition-colors duration-300">
 
-<!-- NAVBAR RESPONSIVE -->
-<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+<!-- NAVBAR RESPONSIVE (Control dinámico por IDs) -->
+<nav id="navbar-context" class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300">
   <div class="flex justify-between items-center">
 
     <!-- LOGO -->
     <div class="flex items-center gap-3 text-white font-bold text-xl">
       <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
-      <span class="text-xl md:text-2xl">PictoVoz</span>
+      <span id="lblBrandName" class="text-xl md:text-2xl">PictoVoz</span>
     </div>
 
     <!-- BOTON MENU MOBILE -->
@@ -37,8 +37,8 @@
 
     <!-- MENU DESKTOP -->
     <div class="hidden md:flex items-center gap-4 text-white">
-      <span id="bienvenida" class="font-semibold"></span>
-      <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menu</a>
+      <span id="bienvenida" class="font-black text-sm md:text-base tracking-wide">Cargando perfil...</span>
+      <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menú</a>
       <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
         Cerrar Sesión
       </button>
@@ -48,8 +48,8 @@
 
   <!-- MENU MOBILE -->
   <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
-    <span id="bienvenida-mobile" class="font-semibold text-center text-lg"></span>
-    <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition">Menu</a>
+    <span id="bienvenida-mobile" class="font-bold text-center text-lg">Cargando perfil...</span>
+    <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition text-center">Menú</a>
     <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
       Cerrar Sesión
     </button>
@@ -62,7 +62,7 @@
     <p class="text-gray-600 mt-2 font-semibold">Haz clic en las letras para formar tu palabra o frase:</p>
 
     <!-- 🟦 CAMPO DE FRASE (TEXTAREA) -->
-    <div class="mt-6 max-w-2xl mx-auto flex gap-3 bg-white p-3 rounded-3xl border-4 border-green-200 shadow-lg items-center">
+    <div id="wrapper-frase" class="mt-6 max-w-2xl mx-auto flex gap-3 bg-white p-3 rounded-3xl border-4 border-green-200 shadow-lg items-center transition-all duration-300">
       <textarea id="campo-frase" placeholder="Tu frase aparecerá aquí..." class="w-full text-lg font-medium px-3 py-2 outline-none resize-none overflow-hidden h-12 text-gray-700" readonly></textarea>
       <button id="btn-voz" title="Reproducir 🔊" class="bg-blue-400 hover:bg-blue-500 text-white p-4 text-xl rounded-2xl transition shadow-md shrink-0">🔊</button>
     </div>
@@ -71,7 +71,7 @@
     <div class="mt-8 flex flex-col lg:flex-row gap-6 justify-center items-start px-2">
       
       <!-- Contenedor Dinámico de Teclas -->
-      <div class="contenedor-teclado flex flex-col gap-3 w-full lg:max-w-4xl bg-white/40 backdrop-blur-sm p-4 rounded-3xl border-2 border-green-300 shadow-md">
+      <div id="contenedor-teclado-box" class="contenedor-teclado flex flex-col gap-3 w-full lg:max-w-4xl bg-white/40 backdrop-blur-sm p-4 rounded-3xl border-2 border-green-300 shadow-md transition-all duration-300">
         <!-- Generado por JS -->
       </div>
 
@@ -89,7 +89,14 @@
 <script type="module">
     import { supabase } from '/pages/Login/supabase.js';
 
-    /* ELEMENTOS DOM */
+    /* ELEMENTOS DEL CONTEXTO DINÁMICO */
+    const bodyContext = document.getElementById('body-context');
+    const navbarContext = document.getElementById('navbar-context');
+    const lblBrandName = document.getElementById('lblBrandName');
+    const wrapperFrase = document.getElementById('wrapper-frase');
+    const contenedorTecladoBox = document.getElementById('contenedor-teclado-box');
+
+    /* ELEMENTOS DOM GENERALES */
     const bienvenida = document.getElementById('bienvenida');
     const bienvenidaMobile = document.getElementById('bienvenida-mobile');
     const cerrarBtn = document.getElementById('cerrar-sesion-btn');
@@ -97,84 +104,121 @@
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
 
-    /* AUTENTICACIÓN */
-    async function mostrarUsuario() {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        const user = data?.user;
-        if (user) {
-          const nombre = user.user_metadata?.full_name || user.email;
-          bienvenida.textContent = `${nombre}`;
-          bienvenidaMobile.textContent = `${nombre}`;
-        } else {
+    /* AUTENTICACIÓN HÍBRIDA E INTELIGENTE */
+    async function inicializarAutenticacionYEstilos() {
+      const cedulaInstitucional = localStorage.getItem("user_cedula");
+
+      if (cedulaInstitucional) {
+        // --- ADAPTACIÓN VISUAL MODO INSTITUCIONAL ---
+        bodyContext.className = "font-sans bg-gradient-to-b from-blue-100 to-indigo-100 text-center min-h-screen overflow-x-hidden";
+        navbarContext.className = "bg-gradient-to-r from-blue-600 to-blue-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+        lblBrandName.textContent = "PictoVoz Institucional";
+        wrapperFrase.className = "mt-6 max-w-2xl mx-auto flex gap-3 bg-white p-3 rounded-3xl border-4 border-blue-200 shadow-lg items-center transition-all duration-300";
+        contenedorTecladoBox.className = "contenedor-teclado flex flex-col gap-3 w-full lg:max-w-4xl bg-white/40 backdrop-blur-sm p-4 rounded-3xl border-2 border-blue-300 shadow-md transition-all duration-300";
+
+        try {
+          // Consultar los datos directamente en PostgreSQL usando la cédula
+          const { data: usuario, error } = await supabase
+            .from('personal_institucional')
+            .select('nombre')
+            .eq('cedula', cedulaInstitucional)
+            .single();
+
+          if (error || !usuario) throw new Error("Cédula no válida en la base de datos");
+
+          bienvenida.textContent = `Bienvenido, ${usuario.nombre}`;
+          bienvenidaMobile.textContent = `Bienvenido, ${usuario.nombre}`;
+
+        } catch (err) {
+          console.error('Error institucional:', err.message);
+          localStorage.removeItem("user_cedula");
           window.location.href = '/pages/Login/login.html';
         }
-      } catch (err) {
-        console.error('Error al obtener usuario:', err.message);
-        window.location.href = '/pages/Login/login.html';
-      }
-    }
-    mostrarUsuario();
 
-    // Menú Hamburguesa
+      } else {
+        // --- ADAPTACIÓN VISUAL MODO PÚBLICO (GOOGLE) ---
+        bodyContext.className = "font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen overflow-x-hidden";
+        navbarContext.className = "bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
+        lblBrandName.textContent = "PictoVoz";
+
+        try {
+          const { data, error } = await supabase.auth.getUser();
+          if (error) throw error;
+          const user = data?.user;
+          
+          if (user) {
+            const nombre = user.user_metadata?.full_name || user.email;
+            bienvenida.textContent = `Bienvenido, ${nombre}`;
+            bienvenidaMobile.textContent = `Bienvenido, ${nombre}`;
+          } else {
+            window.location.href = '/pages/Login/login.html';
+          }
+        } catch (err) {
+          console.error('Error de autenticación pública:', err.message);
+          window.location.href = '/pages/Login/login.html';
+        }
+      }
+      
+      // Generar el teclado interactivo después de resolver los estilos base
+      generarTeclado(cedulaInstitucional ? 'border-blue-200' : 'border-green-200');
+    }
+
+    // Menú Hamburguesa Móvil
     menuBtn.onclick = () => {
       mobileMenu.classList.toggle('hidden');
       mobileMenu.classList.toggle('flex');
     };
 
-    // Logout
+    // Logout Unificado
     const cerrarSesion = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error al cerrar sesión:', error.message);
-        alert('No se pudo cerrar la sesión.');
-        return;
-      }
+      localStorage.removeItem("user_cedula");
+      await supabase.auth.signOut();
       window.location.href = '/pages/Login/login.html';
     };
     cerrarBtn.onclick = cerrarSesion;
     cerrarBtnMobile.onclick = cerrarSesion;
 
-    /* ===== TECLADO DE SEÑAS QWERTY ===== */
+    /* ===== TECLADO DE SEÑAS QWERTY DINÁMICO ===== */
     const filas = [
       ['Q','W','E','R','T','Y','U','I','O','P'],
       ['A','S','D','F','G','H','J','K','L','Ñ'],
       ['Z','X','C','V','B','N','M']
     ];
 
-    const contenedorTeclado = document.querySelector('.contenedor-teclado');
     const campoFrase = document.getElementById('campo-frase');
     const btnVoz = document.getElementById('btn-voz');
     const btnBorrar = document.getElementById('btn-borrar');
     const btnBorrarLetra = document.getElementById('btn-borrar-letra');
     const btnEspacio = document.getElementById('btn-espacio');
 
-    // Generar el teclado responsivo
-    filas.forEach(fila => {
-      const filaDiv = document.createElement('div');
-      filaDiv.className = 'flex justify-center gap-1 sm:gap-2 w-full';
+    // Función modificada para inyectar la clase de borde correcta dinámicamente
+    function generarTeclado(claseBorde) {
+      contenedorTecladoBox.innerHTML = ""; // Limpiar contenedor
       
-      fila.forEach(letra => {
-        const div = document.createElement('div');
-        // Estilos para teclas grandes y legibles para niños
-        div.className = 'bg-white rounded-xl sm:rounded-2xl border-2 border-green-200 shadow hover:scale-110 transition p-1 sm:p-2 cursor-pointer flex flex-col items-center justify-between w-[9%] aspect-[3/4] max-w-[80px] min-w-[32px]';
+      filas.forEach(fila => {
+        const filaDiv = document.createElement('div');
+        filaDiv.className = 'flex justify-center gap-1 sm:gap-2 w-full';
         
-        div.innerHTML = `
-          <img src="/images/LS/${letra}.jpg" alt="${letra}" class="w-full object-contain rounded-lg flex-1" />
-          <span class="font-black text-xs sm:text-base text-gray-700 mt-1 block">${letra}</span>
-        `;
-        
-        div.addEventListener('click', () => {
-          campoFrase.value += letra;
-          ajustarAltura(campoFrase);
+        fila.forEach(letra => {
+          const div = document.createElement('div');
+          div.className = `bg-white rounded-xl sm:rounded-2xl border-2 ${claseBorde} shadow hover:scale-110 transition p-1 sm:p-2 cursor-pointer flex flex-col items-center justify-between w-[9%] aspect-[3/4] max-w-[80px] min-w-[32px]`;
+          
+          div.innerHTML = `
+            <img src="/images/LS/${letra}.jpg" alt="${letra}" class="w-full object-contain rounded-lg flex-1" onerror="this.src='https://placehold.co/100?text=${letra}'" />
+            <span class="font-black text-xs sm:text-base text-gray-700 mt-1 block">${letra}</span>
+          `;
+          
+          div.addEventListener('click', () => {
+            campoFrase.value += letra;
+            ajustarAltura(campoFrase);
+          });
+          filaDiv.appendChild(div);
         });
-        filaDiv.appendChild(div);
+        contenedorTecladoBox.appendChild(filaDiv);
       });
-      contenedorTeclado.appendChild(filaDiv);
-    });
+    }
 
-    // 🔊 Reproducir con voz
+    // 🔊 Reproducir con voz (TTS)
     btnVoz.addEventListener('click', () => {
       const texto = campoFrase.value.trim();
       if (!texto) return;
@@ -203,11 +247,13 @@
       ajustarAltura(campoFrase);
     });
 
-    // Ajustar altura automáticamente de la barra de texto
     function ajustarAltura(textarea) {
       textarea.style.height = 'auto';
       textarea.style.height = textarea.scrollHeight + 'px';
     }
+
+    // Arrancar el flujo reactivo
+    inicializarAutenticacionYEstilos();
 </script>
 
 </body>

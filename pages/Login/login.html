@@ -81,9 +81,17 @@
       </div>
 
       <!-- GOOGLE BUTTON -->
-      <button id="googleLogin" class="flex items-center justify-center gap-3 w-full max-w-sm border-2 border-gray-300 hover:border-green-400 py-3 rounded-2xl hover:bg-gray-50 transition-all font-black text-gray-700 shadow-sm">
+      <button id="googleLogin" class="flex items-center justify-center gap-3 w-full max-w-sm border-2 border-gray-300 hover:border-green-400 py-3 rounded-2xl hover:bg-gray-50 transition-all font-black text-gray-700 shadow-sm mb-3">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s" class="w-6 h-6 object-contain"/>
         Iniciar con Google
+      </button>
+
+      <!-- INSTITUTIONAL BUTTON -->
+      <button id="institutionalLogin" class="flex items-center justify-center gap-3 w-full max-w-sm border-2 border-gray-300 hover:border-blue-400 py-3 rounded-2xl hover:bg-gray-50 transition-all font-black text-gray-700 shadow-sm">
+        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+        Logueo Institucional
       </button>
 
       <!-- BOTÓN CONMUTADOR MÓVIL -->
@@ -163,6 +171,7 @@
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
     const googleLoginBtn = document.getElementById("googleLogin");
+    const institutionalLoginBtn = document.getElementById("institutionalLogin");
 
     const menuBtn = document.getElementById("menuBtn");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -220,10 +229,10 @@
 
 
     /* =========================================
-       AUTENTICACIÓN SUPABASE
+        AUTENTICACIÓN SUPABASE
     ========================================= */
 
-    /* Login */
+    /* Login General */
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const correo = loginForm.correo.value.trim();
@@ -238,7 +247,13 @@
         alert("⚠️ " + error.message);
       } else {
         alert("✅ Bienvenido a PictoVoz");
-        window.location.href = "/pages/menu/teclado-menu.html";
+        
+        // 🎛️ REDIRECCIÓN INTELIGENTE: Si eres tú, vas directo al panel
+        if (correo === 'admin@pictovoz.com') {
+          window.location.href = "/panelcontrol/admin.html"; 
+        } else {
+          window.location.href = "/pages/menu/teclado-menu.html"; 
+        }
       }
     });
 
@@ -261,7 +276,6 @@
         alert("⚠️ " + error.message);
       } else {
         alert("✅ Cuenta registrada. Por favor revisa tu bandeja de correo electrónico para verificarla.");
-        // En móviles regresamos la vista al login automáticamente para que ingresen
         btnSwitchALogin.click();
       }
     });
@@ -278,6 +292,11 @@
       if (error) {
         alert("⚠️ Error de autenticación mediante Google");
       }
+    });
+
+    /* Logueo Institucional */
+    institutionalLoginBtn.addEventListener("click", () => {
+      window.location.href = "/pages intitucional/login/login.html";
     });
 
   });

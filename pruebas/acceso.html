@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso | PictoVoz</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="font-sans bg-gradient-to-b from-green-100 to-blue-100 min-h-screen flex flex-col overflow-x-hidden antialiased">
+
+<!-- NAVBAR RESPONSIVE -->
+<nav class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50">
+  <div class="flex justify-between items-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+      <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+      <span class="text-xl md:text-2xl">PictoVoz</span>
+    </div>
+
+    <!-- MENU DESKTOP -->
+    <div class="hidden md:flex items-center gap-6 text-white font-bold">
+      <a href="/index.html" class="hover:bg-white/20 px-3 py-2 rounded-xl transition">Inicio</a>
+      <a href="/pages/Login/reset.html" class="hover:bg-white/20 px-3 py-2 rounded-xl transition">Recuperar</a>
+    </div>
+
+    <!-- BOTON MENU MOBILE -->
+    <button id="menuBtn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+      ☰
+    </button>
+
+  </div>
+
+  <!-- MENU MOBILE -->
+  <div id="mobileMenu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in text-lg font-bold">
+    <a href="/index.html" class="hover:bg-white/20 py-2 rounded-xl transition">Inicio</a>
+    <a href="/pages/Login/reset.html" class="hover:bg-white/20 py-2 rounded-xl transition">Recuperar</a>
+    <a href="#" class="hover:bg-white/20 py-2 rounded-xl transition">Ayuda</a>
+  </div>
+</nav>
+
+<!-- ===== CONTENEDOR CENTRAL RESPONSIVO ===== -->
+<main class="flex flex-1 items-center justify-center px-4 py-8 md:py-12">
+
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl min-h-[580px] md:min-h-[550px] relative overflow-hidden border-4 border-green-200 flex transition-all duration-300">
+    
+    <!-- 🟢 PANEL: INICIAR SESIÓN -->
+    <div id="panelLogin" class="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-center items-center z-10 bg-white transition-all duration-500">
+      <h2 class="text-3xl font-extrabold text-gray-700 mb-6 text-center">Iniciar Sesión</h2>
+      
+      <form id="loginForm" class="space-y-4 w-full max-w-sm">
+        <input type="email" name="correo" placeholder="Correo electrónico" required
+        class="w-full px-4 py-3 rounded-2xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none text-lg font-medium text-gray-700 transition"/>
+
+        <input type="password" name="contraseña" placeholder="Contraseña" required
+        class="w-full px-4 py-3 rounded-2xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none text-lg font-medium text-gray-700 transition"/>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-green-400 hover:scale-[1.02] text-white py-4 rounded-2xl font-black text-xl shadow-md transition-all mt-2">
+          Ingresar
+        </button>
+      </form>
+
+      <!-- DIVIDER -->
+      <div class="flex items-center my-4 w-full max-w-sm">
+        <div class="flex-grow border-t-2 border-gray-100"></div>
+        <span class="mx-3 text-gray-400 font-bold">o</span>
+        <div class="flex-grow border-t-2 border-gray-100"></div>
+      </div>
+
+      <!-- GOOGLE BUTTON -->
+      <button id="googleLogin" class="flex items-center justify-center gap-3 w-full max-w-sm border-2 border-gray-300 hover:border-green-400 py-3 rounded-2xl hover:bg-gray-50 transition-all font-black text-gray-700 shadow-sm mb-3">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s" class="w-6 h-6 object-contain"/>
+        Iniciar con Google
+      </button>
+
+      <!-- INSTITUTIONAL BUTTON -->
+      <button id="institutionalLogin" class="flex items-center justify-center gap-3 w-full max-w-sm border-2 border-gray-300 hover:border-blue-400 py-3 rounded-2xl hover:bg-gray-50 transition-all font-black text-gray-700 shadow-sm">
+        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+        Logueo Institucional
+      </button>
+
+      <!-- BOTÓN CONMUTADOR MÓVIL -->
+      <div class="mt-6 text-center md:hidden">
+        <p class="font-bold text-gray-500 text-sm sm:text-base">
+          ¿No tienes cuenta? 
+          <button id="btnSwitchARegistro" class="text-green-600 underline font-black ml-1">Regístrate aquí</button>
+        </p>
+      </div>
+      <p class="mt-4"><a href="/pages/Login/reset.html" class="text-gray-400 hover:text-green-600 hover:underline text-sm font-semibold">¿Olvidaste tu contraseña?</a></p>
+    </div>
+
+    <!-- 🔵 PANEL: REGISTRARSE -->
+    <div id="panelRegistro" class="w-full md:w-1/2 p-6 sm:p-8 hidden md:flex flex-col justify-center items-center z-10 bg-white transition-all duration-500">
+      <h2 class="text-3xl font-extrabold text-gray-700 mb-4 text-center">Crear Cuenta</h2>
+      
+      <div class="bg-yellow-100 border border-yellow-300 text-gray-700 p-3 rounded-xl text-sm mb-4 shadow-sm w-full max-w-sm font-medium">
+        Usa un <strong>correo real</strong> para recibir la clave de activación.
+      </div>
+
+      <form id="registerForm" class="space-y-4 w-full max-w-sm">
+        <input type="text" name="nombre" placeholder="Nombre completo" required
+        class="w-full px-4 py-3 rounded-2xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none text-lg font-medium text-gray-700 transition"/>
+
+        <input type="email" name="correo" placeholder="Correo electrónico" required
+        class="w-full px-4 py-3 rounded-2xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none text-lg font-medium text-gray-700 transition"/>
+
+        <input type="password" name="contraseña" placeholder="Contraseña" required
+        class="w-full px-4 py-3 rounded-2xl border-2 border-green-300 focus:ring-4 focus:ring-green-300 outline-none text-lg font-medium text-gray-700 transition"/>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-indigo-400 hover:scale-[1.02] text-white py-4 rounded-2xl font-black text-xl shadow-md transition-all mt-2">
+          Registrarse
+        </button>
+      </form>
+
+      <!-- BOTÓN CONMUTADOR MÓVIL -->
+      <div class="mt-6 text-center md:hidden">
+        <p class="font-bold text-gray-600 text-sm sm:text-base">
+          ¿Ya tienes cuenta? 
+          <button id="btnSwitchALogin" class="text-blue-600 underline font-black ml-1">Inicia sesión</button>
+        </p>
+      </div>
+    </div>
+
+    <!-- 🛝 PUERTA/TARJETA DESLIZANTE FRONTAL (Solo pantallas de escritorio 'md') -->
+    <div id="capaDeslizante" class="hidden md:flex absolute top-0 left-1/2 w-1/2 h-full bg-gradient-to-br from-green-500 to-emerald-600 z-20 text-white flex-col justify-center items-center p-12 transition-transform duration-700 ease-in-out">
+      
+      <!-- Contenido Vista Login -->
+      <div id="contenidoOverlayLogin" class="flex flex-col items-center gap-6 transition-all duration-500">
+        <h3 class="text-3xl font-black">¡Hola de nuevo!</h3>
+        <p class="text-lg font-medium text-center text-green-100">Para mantenerte conectado con tus pictogramas personalizados, inicia sesión.</p>
+        <button id="btnIrARegistro" class="border-4 border-white bg-transparent hover:bg-white hover:text-green-600 text-white px-8 py-3 rounded-2xl font-black text-lg transition-all shadow-md active:scale-95">
+          Crear Cuenta
+        </button>
+      </div>
+
+      <!-- Contenido Vista Registro -->
+      <div id="contenidoOverlayRegistro" class="hidden flex flex-col items-center gap-6 transition-all duration-500">
+        <h3 class="text-3xl font-black">¡Únete a PictoVoz!</h3>
+        <p class="text-lg font-medium text-center text-green-100">Regístrate y empieza a usar herramientas inclusivas de comunicación por voz.</p>
+        <button id="btnIrALogin" class="border-4 border-white bg-transparent hover:bg-white hover:text-green-600 text-white px-8 py-3 rounded-2xl font-black text-lg transition-all shadow-md active:scale-95">
+          Iniciar Sesión
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ===== LÓGICA DE CONTROL & SUPABASE ===== -->
+<script type="module">
+  import { supabase } from '/pages/Login/supabase.js';
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const googleLoginBtn = document.getElementById("googleLogin");
+    const institutionalLoginBtn = document.getElementById("institutionalLogin");
+
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    // Paneles base
+    const panelLogin = document.getElementById("panelLogin");
+    const panelRegistro = document.getElementById("panelRegistro");
+
+    // Elementos de Animación (Escritorio)
+    const capaDeslizante = document.getElementById("capaDeslizante");
+    const contenidoOverlayLogin = document.getElementById("contenidoOverlayLogin");
+    const contenidoOverlayRegistro = document.getElementById("contenidoOverlayRegistro");
+    const btnIrARegistro = document.getElementById("btnIrARegistro");
+    const btnIrALogin = document.getElementById("btnIrALogin");
+
+    // Elementos de Control Conmutador (Móvil)
+    const btnSwitchARegistro = document.getElementById("btnSwitchARegistro");
+    const btnSwitchALogin = document.getElementById("btnSwitchALogin");
+
+    /* 📱 Navegación Navbar Móvil */
+    menuBtn.onclick = () => {
+      mobileMenu.classList.toggle("hidden");
+      mobileMenu.classList.toggle("flex");
+    };
+
+    /* 🛝 COMPORTAMIENTO ESCRITORIO (md: adelante) */
+    btnIrARegistro.onclick = () => {
+      capaDeslizante.style.transform = "translateX(-100%)";
+      contenidoOverlayLogin.classList.add("hidden");
+      contenidoOverlayRegistro.classList.remove("hidden");
+    };
+
+    btnIrALogin.onclick = () => {
+      capaDeslizante.style.transform = "translateX(0%)";
+      contenidoOverlayRegistro.classList.add("hidden");
+      contenidoOverlayLogin.classList.remove("hidden");
+    };
+
+    /* 📱 COMPORTAMIENTO MÓVIL (Intercambio Limpio de Formularios) */
+    btnSwitchARegistro.onclick = () => {
+      panelLogin.classList.add("hidden");
+      panelLogin.classList.remove("flex");
+      
+      panelRegistro.classList.remove("hidden");
+      panelRegistro.classList.add("flex");
+    };
+
+    btnSwitchALogin.onclick = () => {
+      panelRegistro.classList.add("hidden");
+      panelRegistro.classList.remove("flex");
+      
+      panelLogin.classList.remove("hidden");
+      panelLogin.classList.add("flex");
+    };
+
+
+    /* =========================================
+        AUTENTICACIÓN SUPABASE
+    ========================================= */
+
+    /* Login */
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const correo = loginForm.correo.value.trim();
+      const contraseña = loginForm.contraseña.value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: correo,
+        password: contraseña,
+      });
+
+      if (error) {
+        alert("⚠️ " + error.message);
+      } else {
+        alert("✅ Bienvenido a PictoVoz");
+        window.location.href = "/pages/menu/teclado-menu.html";
+      }
+    });
+
+    /* Registro */
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nombre = registerForm.nombre.value.trim();
+      const correo = registerForm.correo.value.trim();
+      const contraseña = registerForm.contraseña.value;
+
+      const { error } = await supabase.auth.signUp({
+        email: correo,
+        password: contraseña,
+        options: {
+          data: { full_name: nombre },
+        },
+      });
+
+      if (error) {
+        alert("⚠️ " + error.message);
+      } else {
+        alert("✅ Cuenta registrada. Por favor revisa tu bandeja de correo electrónico para verificarla.");
+        // En móviles regresamos la vista al login automáticamente para que ingresen
+        btnSwitchALogin.click();
+      }
+    });
+
+    /* Google OAuth */
+    googleLoginBtn.addEventListener("click", async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/pages/menu/teclado-menu.html'
+        }
+      });
+
+      if (error) {
+        alert("⚠️ Error de autenticación mediante Google");
+      }
+    });
+
+    /* Logueo Institucional (Manejador modificado) */
+    institutionalLoginBtn.addEventListener("click", () => {
+      // Redirecciona directamente a la nueva pantalla institucional
+      window.location.href = "institucional.html";
+    });
+
+  });
+</script>
+
+</body>
+</html>

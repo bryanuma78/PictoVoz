@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin | PictoVoz</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans bg-slate-50 min-h-screen flex flex-col antialiased">
+
+  <!-- TOPBAR -->
+  <header class="bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-md px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-xl text-white shadow-md">P</div>
+      <div>
+        <h1 class="font-black text-lg tracking-wide">PictoVoz SuperAdmin</h1>
+        <p class="text-xs text-slate-400 font-medium">Gestión de Entidades y Roles Globales</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="bg-slate-700/50 text-slate-300 text-xs px-3 py-1.5 rounded-full font-bold border border-slate-700">Modo: Administrador Raíz</span>
+      <button id="btnCerrarSesion" class="text-sm font-bold text-rose-400 hover:text-rose-300 transition">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- 🏢 SECCIÓN IZQUIERDA: GESTIÓN DE INSTITUCIONES -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- CARD: FORMULARIO INSTITUCCIÓN -->
+      <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
+        <h2 id="instFormTitle" class="text-xl font-extrabold text-slate-800 mb-1 flex items-center gap-2">
+          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Nueva Institución
+        </h2>
+        <p class="text-slate-400 text-xs font-medium mb-4">Registra o actualiza un centro educativo en el sistema.</p>
+
+        <form id="instForm" class="space-y-3">
+          <input type="hidden" id="editingInstId" value="">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Nombre de la Institución</label>
+            <input type="text" id="instNombre" required placeholder="Ej. Escuela Manuela Cañizares" 
+              class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 outline-none focus:border-emerald-500 font-medium text-sm transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Código Único (AMIE / RUC)</label>
+            <input type="text" id="instCodigo" required placeholder="Ej. 1792345678" 
+              class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 outline-none focus:border-emerald-500 font-medium text-sm transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Dirección de la Institución</label>
+            <input type="text" id="instDireccion" required placeholder="Ej. Av. Maldonado e Illescas" 
+              class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 outline-none focus:border-emerald-500 font-medium text-sm transition">
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" id="btnSubmitInst" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-all active:scale-98">
+              Guardar Institución
+            </button>
+            <button type="button" id="btnCancelInstEdit" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CARD: LISTA DE INSTITUCIONES -->
+      <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 flex-1 flex flex-col">
+        <h2 class="text-xl font-extrabold text-slate-800 mb-1 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          Instituciones Registradas
+        </h2>
+        <p class="text-slate-400 text-xs font-medium mb-4">Selecciona para desplegar personal o usa los íconos para editar/borrar.</p>
+        
+        <div id="instLista" class="space-y-2 overflow-y-auto max-h-[350px] flex-1 pr-1">
+          <!-- Carga vía JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 👥 SECCIÓN DERECHA: GESTIÓN INTERNA DE ROLES -->
+    <section class="lg:col-span-7">
+      
+      <!-- ESTADO SIN SELECCIONAR -->
+      <div id="panelVacio" class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-3xl h-full min-h-[450px] flex flex-col items-center justify-center p-8 text-center">
+        <div class="w-16 h-16 bg-slate-200 rounded-2xl flex items-center justify-center text-slate-400 mb-4 animate-pulse">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-600">Ninguna institución seleccionada</h3>
+        <p class="text-slate-400 text-sm max-w-sm mt-1">Haz clic en una institución de la izquierda para administrar sus usuarios vinculados.</p>
+      </div>
+
+      <!-- PANEL ACTIVO -->
+      <div id="panelDetalle" class="hidden bg-white p-6 rounded-3xl shadow-xl border border-slate-100 flex flex-col h-full transition-all">
+        
+        <div class="border-b-2 border-slate-100 pb-4 mb-6 flex justify-between items-start">
+          <div>
+            <span class="bg-blue-100 text-blue-700 font-extrabold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md" id="txtDetalleCodigo">ID: -</span>
+            <h3 class="text-2xl font-black text-slate-800 mt-1" id="txtDetalleNombre">Institución Seleccionada</h3>
+          </div>
+        </div>
+
+        <!-- FORMULARIO USUARIO -->
+        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 mb-6">
+          <h4 id="userFormTitle" class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3">Registrar Usuario de la Entidad</h4>
+          
+          <form id="userForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" id="editingUserId" value="">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Nombre Completo</label>
+              <input type="text" id="userNombre" required placeholder="Ej. Lic. María Augusta" 
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 outline-none focus:border-blue-500 font-medium text-sm bg-white transition">
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Número de Cédula (Credencial)</label>
+              <input type="text" id="userCedula" required maxlength="10" placeholder="Ej. 1755512345" 
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 outline-none focus:border-blue-500 font-medium text-sm bg-white transition tracking-wider">
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Rol Institucional (Acceso Asignado)</label>
+              <select id="userRol" required 
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 outline-none focus:border-blue-500 font-bold text-sm bg-white transition text-slate-700">
+                <option value="Docente">Rol Docente</option>
+                <option value="Estudiante">Rol Estudiante</option>
+                <option value="Soporte IT">Soporte IT de la institución</option>
+                <option value="Encargado Acceso">Encargado de asignar acceso</option>
+                <option value="Rectora">Rol Rectora</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2 flex gap-2 pt-1">
+              <button type="submit" id="btnSubmitUser" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-md transition-all active:scale-98">
+                Vincular Personal con Rol
+              </button>
+              <button type="button" id="btnCancelUserEdit" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-sm transition-all">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- LISTA DE USUARIOS -->
+        <div class="flex-1 flex flex-col">
+          <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3">Estructura Organizativa Actual</h4>
+          
+          <div class="border border-slate-100 rounded-2xl overflow-hidden flex-1 max-h-[300px] overflow-y-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                  <th class="p-3 pl-4">Funcionario / Alumno</th>
+                  <th class="p-3">Identificación (Cédula)</th>
+                  <th class="p-3">Rol</th>
+                  <th class="p-3 pr-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="userTablaBody" class="text-sm divide-y divide-slate-100 font-medium text-slate-700">
+                <!-- Mapeo JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== LOGICA DE ACCIONES CRUD COMPLETAS CON SUPABASE ===== -->
+  <script type="module">
+    import { supabase } from '/pages/Login/supabase.js';
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session || session.user.email !== 'admin@pictovoz.com') {
+        alert("🚫 Acceso denegado. Se requieren credenciales de SuperAdmin.");
+        window.location.href = "/pages/Login/login.html";
+        return;
+      }
+
+      // Selectores globales
+      const instForm = document.getElementById("instForm");
+      const instNombre = document.getElementById("instNombre");
+      const instCodigo = document.getElementById("instCodigo");
+      const instDireccion = document.getElementById("instDireccion");
+      const instLista = document.getElementById("instLista");
+      const instFormTitle = document.getElementById("instFormTitle");
+      const editingInstId = document.getElementById("editingInstId");
+      const btnSubmitInst = document.getElementById("btnSubmitInst");
+      const btnCancelInstEdit = document.getElementById("btnCancelInstEdit");
+
+      const panelVacio = document.getElementById("panelVacio");
+      const panelDetalle = document.getElementById("panelDetalle");
+      const txtDetalleNombre = document.getElementById("txtDetalleNombre");
+      const txtDetalleCodigo = document.getElementById("txtDetalleCodigo");
+
+      const userForm = document.getElementById("userForm");
+      const userNombre = document.getElementById("userNombre");
+      const userCedula = document.getElementById("userCedula");
+      const userRol = document.getElementById("userRol");
+      const userTablaBody = document.getElementById("userTablaBody");
+      const userFormTitle = document.getElementById("userFormTitle");
+      const editingUserId = document.getElementById("editingUserId");
+      const btnSubmitUser = document.getElementById("btnSubmitUser");
+      const btnCancelUserEdit = document.getElementById("btnCancelUserEdit");
+      const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+
+      let idInstitucionSeleccionada = null;
+
+      userCedula.addEventListener("input", (e) => e.target.value = e.target.value.replace(/[^0-9]/g, ''));
+      instCodigo.addEventListener("input", (e) => e.target.value = e.target.value.replace(/[^0-9]/g, ''));
+
+      btnCerrarSesion.onclick = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "/pages/Login/login.html";
+      };
+
+      /* =======================================================
+          CRUD: SECCIÓN INSTITUCIONES
+         ======================================================= */
+      async function cargarInstituciones() {
+        const { data: instituciones, error } = await supabase
+          .from('instituciones')
+          .select('*')
+          .order('nombre', { ascending: true });
+
+        if (error) return;
+        instLista.innerHTML = "";
+        
+        for (const inst of instituciones) {
+          const { count } = await supabase
+            .from('personal_institucional')
+            .select('*', { count: 'exact', head: true })
+            .eq('institucion_id', inst.id);
+
+          const esActiva = inst.id === idInstitucionSeleccionada;
+          const divRow = document.createElement("div");
+          divRow.className = `w-full p-3 rounded-2xl border-2 flex items-center justify-between transition-all ${
+            esActiva ? 'border-blue-500 bg-blue-50/60' : 'border-slate-100 bg-white'
+          }`;
+
+          divRow.innerHTML = `
+            <div class="cursor-pointer flex-1 truncate pr-2" id="trigger-sel-${inst.id}">
+              <h4 class="font-bold text-slate-800 text-sm truncate">${inst.nombre}</h4>
+              <p class="text-[11px] font-semibold text-slate-400">AMIE/RUC: ${inst.codigo_unico}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="bg-slate-100 text-slate-600 font-bold text-[11px] px-2 py-0.5 rounded-full">👥 ${count || 0}</span>
+              <button class="text-blue-500 hover:text-blue-700 p-1" id="btn-edit-i-${inst.id}">✏️</button>
+              <button class="text-rose-500 hover:text-rose-700 p-1" id="btn-del-i-${inst.id}">🗑️</button>
+            </div>
+          `;
+          instLista.appendChild(divRow);
+
+          document.getElementById(`trigger-sel-${inst.id}`).onclick = () => establecerEntidadActiva(inst.id, inst.nombre, inst.codigo_unico);
+          
+          document.getElementById(`btn-edit-i-${inst.id}`).onclick = () => {
+            editingInstId.value = inst.id;
+            instNombre.value = inst.nombre;
+            instCodigo.value = inst.codigo_unico;
+            instDireccion.value = inst.direccion || "";
+            instFormTitle.innerText = "Modificar Institución";
+            btnSubmitInst.innerText = "Actualizar Cambios";
+            btnCancelInstEdit.classList.remove("hidden");
+          };
+
+          document.getElementById(`btn-del-i-${inst.id}`).onclick = async () => {
+            if (confirm(`¿Seguro que deseas eliminar la institución "${inst.nombre}"? Esto borrará también a todo su personal.`)) {
+              await supabase.from('instituciones').delete().eq('id', inst.id);
+              if (idInstitucionSeleccionada === inst.id) {
+                idInstitucionSeleccionada = null;
+                panelDetalle.classList.add("hidden");
+                panelVacio.classList.remove("hidden");
+              }
+              resetearFormularioInstitucion();
+              cargarInstituciones();
+            }
+          };
+        }
+      }
+
+      function resetearFormularioInstitucion() {
+        editingInstId.value = "";
+        instForm.reset();
+        instFormTitle.innerText = "Nueva Institución";
+        btnSubmitInst.innerText = "Guardar Institución";
+        btnCancelInstEdit.classList.add("hidden");
+      }
+
+      btnCancelInstEdit.onclick = () => resetearFormularioInstitucion();
+
+      instForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = editingInstId.value;
+        const payload = {
+          nombre: instNombre.value.trim(),
+          codigo_unico: instCodigo.value.trim(),
+          direccion: instDireccion.value.trim()
+        };
+
+        if (id) {
+          const { error } = await supabase.from('instituciones').update(payload).eq('id', id);
+          if (error) alert("Error: " + error.message);
+          else alert("Institución actualizada correctamente.");
+        } else {
+          const { error } = await supabase.from('instituciones').insert([payload]);
+          if (error) alert("Error: " + error.message);
+          else alert("Institución registrada con éxito.");
+        }
+        resetearFormularioInstitucion();
+        await cargarInstituciones();
+      });
+
+      function establecerEntidadActiva(id, nombre, codigo) {
+        idInstitucionSeleccionada = id;
+        panelVacio.classList.add("hidden");
+        panelDetalle.classList.remove("hidden");
+        txtDetalleNombre.innerText = nombre;
+        txtDetalleCodigo.innerText = `Código AMIE/RUC: ${codigo}`;
+        resetearFormularioUsuario();
+        cargarInstituciones(); 
+        cargarUsuariosDeInstitucion(id);
+      }
+
+      /* =======================================================
+          CRUD: SECCIÓN MIEMBROS / PERSONAL DE LA INSTITUCIÓN
+         ======================================================= */
+      async function cargarUsuariosDeInstitucion(institucionId) {
+        const { data: usuarios, error } = await supabase
+          .from('personal_institucional')
+          .select('*')
+          .eq('institucion_id', institucionId)
+          .order('created_at', { ascending: false });
+
+        if (error) return;
+        userTablaBody.innerHTML = "";
+
+        if (usuarios.length === 0) {
+          userTablaBody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 font-medium italic">No hay personal registrado en esta entidad.</td></tr>`;
+          return;
+        }
+
+        usuarios.forEach(user => {
+          let badgeColor = "bg-slate-100 text-slate-700";
+          if (user.rol === "Rectora") badgeColor = "bg-purple-100 text-purple-700 font-black";
+          if (user.rol === "Docente") badgeColor = "bg-emerald-100 text-emerald-700";
+          if (user.rol === "Estudiante") badgeColor = "bg-amber-100 text-amber-700";
+          if (user.rol === "Soporte IT") badgeColor = "bg-cyan-100 text-cyan-700";
+          if (user.rol === "Encargado Acceso") badgeColor = "bg-rose-100 text-rose-700";
+
+          const row = document.createElement("tr");
+          row.className = "hover:bg-slate-50/50 transition";
+          row.innerHTML = `
+            <td class="p-3 pl-4 font-bold text-slate-800">${user.nombre}</td>
+            <td class="p-3 font-mono text-slate-500 text-xs">${user.cedula}</td>
+            <td class="p-3"><span class="text-[11px] px-2.5 py-0.5 rounded-md font-bold ${badgeColor}">${user.rol}</span></td>
+            <td class="p-3 pr-4 text-right space-x-2 whitespace-nowrap">
+              <button class="text-blue-600 hover:underline font-bold text-xs" id="btn-edit-u-${user.id}">Editar</button>
+              <button class="text-rose-600 hover:underline font-bold text-xs" id="btn-del-u-${user.id}">Eliminar</button>
+            </td>
+          `;
+          userTablaBody.appendChild(row);
+
+          document.getElementById(`btn-edit-u-${user.id}`).onclick = () => {
+            editingUserId.value = user.id;
+            userNombre.value = user.nombre;
+            userCedula.value = user.cedula;
+            userRol.value = user.rol;
+            userFormTitle.innerText = "Modificar Miembro Personal";
+            btnSubmitUser.innerText = "Actualizar Usuario";
+            btnCancelUserEdit.classList.remove("hidden");
+          };
+
+          document.getElementById(`btn-del-u-${user.id}`).onclick = async () => {
+            if (confirm(`¿Retirar a "${user.nombre}" de la institución?`)) {
+              await supabase.from('personal_institucional').delete().eq('id', user.id);
+              cargarUsuariosDeInstitucion(idInstitucionSeleccionada);
+              cargarInstituciones();
+            }
+          };
+        });
+      }
+
+      function resetearFormularioUsuario() {
+        editingUserId.value = "";
+        userForm.reset();
+        userFormTitle.innerText = "Registrar Usuario de la Entidad";
+        btnSubmitUser.innerText = "Vincular Personal con Rol";
+        btnCancelUserEdit.classList.add("hidden");
+      }
+
+      btnCancelUserEdit.onclick = () => resetearFormularioUsuario();
+
+      userForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!idInstitucionSeleccionada) return;
+
+        if (userCedula.value.length < 10) {
+          alert("⚠️ La cédula debe contener exactamente 10 dígitos.");
+          return;
+        }
+
+        const idUsr = editingUserId.value;
+        const payload = {
+          nombre: userNombre.value.trim(),
+          cedula: userCedula.value.trim(),
+          rol: userRol.value,
+          institucion_id: idInstitucionSeleccionada
+        };
+
+        if (idUsr) {
+          const { error } = await supabase.from('personal_institucional').update(payload).eq('id', idUsr);
+          if (error) alert("Error: " + error.message);
+          else alert("Información del usuario actualizada con éxito.");
+        } else {
+          const { error } = await supabase.from('personal_institucional').insert([payload]);
+          if (error) alert("Error: " + error.message);
+          else alert("Usuario vinculado correctamente a la institución.");
+        }
+
+        resetearFormularioUsuario();
+        await cargarInstituciones();
+        cargarUsuariosDeInstitucion(idInstitucionSeleccionada);
+      });
+
+      await cargarInstituciones();
+    });
+  </script>
+</body>
+</html>
