@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PictoVoz - Minijuego de Selección</title>
+    <title>PictoVoz - Minijuego de Oraciones</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -77,10 +77,10 @@
 
 <section id="seccion-juego" class="mt-8 mx-auto max-w-4xl px-4 pb-16">
     <div id="card-juego" class="bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300">
-        <h2 id="title-juego" class="text-xl sm:text-3xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender!</h2>
-        <p class="text-gray-600 mb-6 font-semibold">Practica el uso del puntero seleccionando el pictograma correcto</p>
+        <h2 id="title-juego" class="text-2xl sm:text-4xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender Frases!</h2>
+        <p class="text-gray-600 mb-6 font-semibold">Completa las palabras de la oración usando el puntero facial o haciendo clic</p>
 
-        <div id="juego-inicio" class="py-6">
+        <div id="juego-inicio" class="py-12">
             <button id="btn-iniciar-juego" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-105 text-white font-black text-xl sm:text-2xl px-12 py-5 rounded-3xl shadow-lg transition-all">
                 🚀 ¡Empezar Juego!
             </button>
@@ -88,14 +88,29 @@
 
         <div id="juego-pantalla" class="hidden animate-fade-in">
             <div id="bg-pregunta" class="bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300">
-                <h3 class="text-xl md:text-3xl font-black text-purple-800">
-                    ¿Cuál es el pictograma de: <span id="juego-pregunta" class="text-blue-600 underline">...</span>?
+                <h3 class="text-xl md:text-2xl font-black text-purple-800">
+                    Forma la oración: <span id="juego-pregunta" class="text-blue-600 underline">...</span>
                 </h3>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-8 bg-gray-50 p-4 rounded-3xl border-2 border-dashed border-gray-300 items-center">
+                <div class="flex flex-col items-center gap-1">
+                    <span id="conector-1" class="text-xs font-bold text-purple-500 tracking-wider">EL / LA</span>
+                    <div id="slot-sujeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Sujeto</div>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xs font-bold text-purple-500 tracking-wider">&nbsp;</span>
+                    <div id="slot-accion" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Acción</div>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span id="conector-2" class="text-xs font-bold text-purple-500 tracking-wider">UN / UNA</span>
+                    <div id="slot-objeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Objeto</div>
+                </div>
             </div>
 
             <div id="juego-feedback" class="text-2xl font-bold mb-6 h-8 transition-all duration-300"></div>
 
-            <div id="juego-opciones" class="grid grid-cols-1 sm:grid-cols-3 gap-6 justify-center items-center max-w-2xl mx-auto"></div>
+            <div id="juego-opciones" class="grid grid-cols-3 sm:grid-cols-6 gap-4 justify-center items-center max-w-3xl mx-auto p-4 bg-purple-50/50 rounded-2xl"></div>
 
             <div class="mt-8 flex justify-center gap-8 text-xl font-bold text-gray-700">
                 <p>✅ Aciertos: <span id="puntos-aciertos" class="text-green-500">0</span></p>
@@ -145,21 +160,53 @@ const juegoFeedbackDiv = document.getElementById('juego-feedback');
 const txtAciertos = document.getElementById('puntos-aciertos');
 const txtRacha = document.getElementById('puntos-racha');
 
+const conector1Span = document.getElementById('conector-1');
+const conector2Span = document.getElementById('conector-2');
+const slotSujeto = document.getElementById('slot-sujeto');
+const slotAccion = document.getElementById('slot-accion');
+const slotObjeto = document.getElementById('slot-objeto');
+
 /* VARIABLES DE ESTADO */
 let userId = null;
 let punteroActivo = true;
 let isInstitucional = false;
 
 let juegoActivo = false;
-let opcionCorrecta = null;
 let aciertos = 0;
 let rachaActual = 0;
 
-/* 🌟 BANCO DE PALABRAS EXCLUSIVO PARA GENERAR RONDAS DESDE LA API */
-const bolsaPalabrasJuego = [
-  "Manzana", "Plátano", "Perro", "Gato", "Pelota", "Libro", "Agua", 
-  "Leche", "Carro", "Casa", "Sol", "Luna", "Árbol", "Mesa", "Silla",
-  "Niño", "Niña", "Juguete", "Cuaderno", "Pizarra", "Sopa", "Pescado"
+let pasoFraseActual = 0;
+let datosRondaActual = { sujeto: null, accion: null, objeto: null, fraseLectura: "", conectorSujeto: "", conectorObjeto: "" };
+
+/* DICCIONARIO SEMÁNTICO COHERENTE */
+const poolSujetos = [
+    { palabra: "Niño", genero: "M" }, { palabra: "Niña", genero: "F" }, 
+    { palabra: "Mamá", genero: "F" }, { palabra: "Papá", genero: "M" }, 
+    { palabra: "Profesor", genero: "M" }, { palabra: "Abuelo", genero: "M" }
+];
+
+const contextosOraciones = [
+    {
+        acciones: ["Come", "Bebe", "Corta"],
+        objetos: [
+            { palabra: "Manzana", genero: "F" }, { palabra: "Agua", genero: "F" }, 
+            { palabra: "Sopa", genero: "F" }, { palabra: "Plátano", genero: "M" }
+        ]
+    },
+    {
+        acciones: ["Mira", "Dibuja", "Lee"],
+        objetos: [
+            { palabra: "Libro", genero: "M" }, { palabra: "Cuaderno", genero: "M" }, 
+            { palabra: "Pizarra", genero: "F" }, { palabra: "Pintura", genero: "F" }
+        ]
+    },
+    {
+        acciones: ["Juega", "Lava", "Busca"],
+        objetos: [
+            { palabra: "Pelota", genero: "F" }, { palabra: "Carro", genero: "M" }, 
+            { palabra: "Juguete", genero: "M" }, { palabra: "Gato", genero: "M" }
+        ]
+    }
 ];
 
 /* CONTROL DE USUARIO & AUTENTICACIÓN HÍBRIDA */
@@ -184,31 +231,19 @@ async function inicializarAutenticacionYEstilos() {
         .single();
 
       if (error || !usuario) throw new Error("Cédula no válida");
-
       bienvenida.textContent = `Bienvenido, ${usuario.nombre}`;
       bienvenidaMobile.textContent = `Bienvenido, ${usuario.nombre}`;
       userId = cedulaInstitucional; 
-
     } catch (err) {
       localStorage.removeItem("user_cedula");
       location.href = '/pages/Login/login.html';
     }
-
   } else {
     isInstitucional = false;
-    bodyContext.className = "font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden min-h-screen transition-colors duration-300";
-    navbarContext.className = "bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300";
-    lblBrandName.textContent = "PictoVoz";
-    cardJuego.className = "bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300";
-    titleJuego.className = "text-xl sm:text-3xl font-extrabold text-purple-600 mb-2";
-    bgPregunta.className = "bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300";
-    videoCam.className = "rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300";
-
     try{
       const { data, error } = await supabase.auth.getUser();
       if(error) throw error;
       const user = data?.user;
-
       if(user){
         userId = user.id;
         const nombre = user.user_metadata?.full_name || user.email;
@@ -223,6 +258,18 @@ async function inicializarAutenticacionYEstilos() {
   }
 }
 
+/* EXTRAER DESDE LA API DE ARASAAC */
+async function buscarImagenEnArasaac(palabra) {
+    try {
+        const res = await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(palabra.toLowerCase())}`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+            return `https://static.arasaac.org/pictograms/${data[0]._id}/${data[0]._id}_300.png`;
+        }
+    } catch (e) { console.error(e); }
+    return "https://via.placeholder.com/150?text=Error";
+}
+
 /* LOGOUT UNIFICADO */
 const cerrarSesion = async () => {
   localStorage.removeItem("user_cedula");
@@ -231,8 +278,7 @@ const cerrarSesion = async () => {
 };
 cerrarBtn.onclick = cerrarSesion;
 cerrarBtnMobile.onclick = cerrarSesion;
-
-menuBtn.onclick = ()=>{
+menuBtn.onclick = () => {
   mobileMenu.classList.toggle('hidden');
   mobileMenu.classList.toggle('flex');
 };
@@ -253,101 +299,148 @@ btnPuntero.onclick = () => {
   }
 };
 
-/* 🌟 FUNCIÓN PARA EXTRAER IMÁGENES AL VUELO DESDE LA API DE ARASAAC */
-async function buscarImagenEnArasaac(palabra) {
-    try {
-        const res = await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(palabra.toLowerCase())}`);
-        const data = await res.json();
-        if (data && data.length > 0) {
-            return `https://static.arasaac.org/pictograms/${data[0]._id}/${data[0]._id}_300.png`;
-        }
-    } catch (e) { console.error("Error buscando en API:", e); }
-    return "https://via.placeholder.com/150?text=Error";
-}
-
 /* =========================================
-   🎮 LÓGICA OPERATIVA DEL MINIJUEGO DE SELECCIÓN DIRECTA
+   🎮 LÓGICA DEL JUEGO
 ========================================= */
 btnIniciarJuego.onclick = () => {
     juegoInicioDiv.classList.add('hidden');
     juegoPantallaDiv.classList.remove('hidden');
     juegoActivo = true;
-    generarNuevaRonda();
+    generarNuevaRondaOracion();
 };
 
-async function generarNuevaRonda() {
+async function generarNuevaRondaOracion() {
+    pasoFraseActual = 0;
     juegoFeedbackDiv.textContent = "";
     juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8";
-    juegoOpcionesDiv.innerHTML = "<p class='col-span-full py-4 text-purple-600 font-bold animate-pulse text-lg'>Buscando opciones en ARASAAC...</p>";
+    juegoOpcionesDiv.innerHTML = "<p class='col-span-full py-4 text-purple-600 font-bold animate-pulse text-lg'>Buscando vocabulario en ARASAAC...</p>";
 
-    // 1. Elegir 3 palabras al azar del pool independiente sin repetición
-    const poolRonda = [...bolsaPalabrasJuego].sort(() => 0.5 - Math.random()).slice(0, 3);
-    
-    // 2. Traer las 3 imágenes correspondientes en paralelo desde la API externa
-    const [img1, img2, img3] = await Promise.all([
-        buscarImagenEnArasaac(poolRonda[0]),
-        buscarImagenEnArasaac(poolRonda[1]),
-        buscarImagenEnArasaac(poolRonda[2])
+    slotSujeto.textContent = "Sujeto"; slotSujeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
+    slotAccion.textContent = "Acción"; slotAccion.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
+    slotObjeto.textContent = "Objeto"; slotObjeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
+
+    const contextoElegido = contextosOraciones[Math.floor(Math.random() * contextosOraciones.length)];
+    const objSujeto = poolSujetos[Math.floor(Math.random() * poolSujetos.length)];
+    const palAccion = contextoElegido.acciones[Math.floor(Math.random() * contextoElegido.acciones.length)];
+    const objObjeto = contextoElegido.objetos[Math.floor(Math.random() * contextoElegido.objetos.length)];
+
+    const cSujeto = objSujeto.genero === "M" ? "El" : "La";
+    const cObjeto = objObjeto.genero === "M" ? "un" : "una";
+
+    const [imgSujeto, imgAccion, imgObjeto] = await Promise.all([
+        buscarImagenEnArasaac(objSujeto.palabra),
+        buscarImagenEnArasaac(palAccion),
+        buscarImagenEnArasaac(objObjeto.palabra)
     ]);
 
-    const seleccionadas = [
-        { palabra: poolRonda[0], img: img1 },
-        { palabra: poolRonda[1], img: img2 },
-        { palabra: poolRonda[2], img: img3 }
-    ];
+    datosRondaActual = {
+        sujeto: { palabra: objSujeto.palabra, img: imgSujeto },
+        accion: { palabra: palAccion, img: imgAccion },
+        objeto: { palabra: objObjeto.palabra, img: imgObjeto },
+        conectorSujeto: cSujeto,
+        conectorObjeto: cObjeto,
+        fraseLectura: `${cSujeto} ${objSujeto.palabra.toLowerCase()} ${palAccion.toLowerCase()} ${cObjeto} ${objObjeto.palabra.toLowerCase()}`
+    };
 
-    // Elegir cuál de las tres será la correcta de la ronda
-    opcionCorrecta = seleccionadas[Math.floor(Math.random() * seleccionadas.length)];
-    juegoPreguntaSpan.textContent = opcionCorrecta.palabra.toUpperCase();
+    conector1Span.textContent = cSujeto.toUpperCase();
+    conector2Span.textContent = cObjeto.toUpperCase();
+    juegoPreguntaSpan.textContent = datosRondaActual.fraseLectura.toUpperCase();
 
     speechSynthesis.cancel();
-    speechSynthesis.speak(new SpeechSynthesisUtterance(`¿Cuál es el pictograma de: ${opcionCorrecta.palabra}?`));
+    speechSynthesis.speak(new SpeechSynthesisUtterance(`Vamos a formar la frase: ${datosRondaActual.fraseLectura}`));
 
-    // Renderizar opciones en pantalla
+    const distSujeto = poolSujetos.filter(s => s.palabra !== objSujeto.palabra).sort(() => 0.5 - Math.random())[0];
+    const contextoAlternativo = contextosOraciones.filter(c => c !== contextoElegido)[0] || contextosOraciones[0];
+    const distAccion = contextoAlternativo.acciones[0];
+    const distObjeto = contextoAlternativo.objetos[0];
+
+    const [imgDSujeto, imgDAccion, imgDObjeto] = await Promise.all([
+        buscarImagenEnArasaac(distSujeto.palabra),
+        buscarImagenEnArasaac(distAccion),
+        buscarImagenEnArasaac(distObjeto.palabra)
+    ]);
+
+    const poolMezclado = [
+        { palabra: objSujeto.palabra, img: imgSujeto, tipo: 'sujeto' },
+        { palabra: palAccion, img: imgAccion, tipo: 'accion' },
+        { palabra: objObjeto.palabra, img: imgObjeto, tipo: 'objeto' },
+        { palabra: distSujeto.palabra, img: imgDSujeto, tipo: 'sujeto' },
+        { palabra: distAccion, img: imgDAccion, tipo: 'accion' },
+        { palabra: distObjeto.palabra, img: imgDObjeto, tipo: 'objeto' }
+    ].sort(() => 0.5 - Math.random());
+
     juegoOpcionesDiv.innerHTML = "";
     const claseBordeCard = isInstitucional ? 'border-blue-200' : 'border-purple-200';
 
-    seleccionadas.forEach(picto => {
+    poolMezclado.forEach(item => {
         const card = document.createElement('div');
-        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-4 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[160px] mx-auto`;
-        card.innerHTML = `<img src="${picto.img}" data-palabra="${picto.palabra}" class="w-[85%] h-[85%] object-contain pictograma-img">`;
+        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-3 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[140px] mx-auto`;
+        card.innerHTML = `
+            <img src="${item.img}" data-palabra="${item.palabra}" class="w-[75%] h-[75%] object-contain pictograma-img">
+            <span class="text-xs font-black text-gray-600 mt-1">${item.palabra}</span>
+        `;
         
-        card.onclick = () => verificarRespuesta(picto.palabra, card);
+        card.onclick = () => verificarRespuestaPaso(item, card);
         juegoOpcionesDiv.appendChild(card);
     });
 }
 
-function verificarRespuesta(palabraSeleccionada, elementoCard) {
+function verificarRespuestaPaso(itemSeleccionado, elementoCard) {
     if (!juegoActivo) return;
     speechSynthesis.cancel();
 
-    if (palabraSeleccionada === opcionCorrecta.palabra) {
-        aciertos++;
-        rachaActual++;
-        txtAciertos.textContent = aciertos;
-        txtRacha.textContent = rachaActual;
+    let esCorrecto = false;
 
-        elementoCard.classList.add('animacion-correcto');
-        juegoFeedbackDiv.textContent = "🌟 ¡Excelente! ¡Lo lograste! 🎉";
-        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-green-500 animate-fade-in";
-        speechSynthesis.speak(new SpeechSynthesisUtterance("¡Excelente! ¡Lo lograste!"));
+    if (pasoFraseActual === 0 && itemSeleccionado.palabra === datosRondaActual.sujeto.palabra) {
+        esCorrecto = true;
+        slotSujeto.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
+        slotSujeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
+    } else if (pasoFraseActual === 1 && itemSeleccionado.palabra === datosRondaActual.accion.palabra) {
+        esCorrecto = true;
+        slotAccion.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
+        slotAccion.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
+    } else if (pasoFraseActual === 2 && itemSeleccionado.palabra === datosRondaActual.objeto.palabra) {
+        esCorrecto = true;
+        slotObjeto.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
+        slotObjeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
+    }
 
-        // 🌟 CORRECCIÓN PUNTERO CONGELADO: Forzar el reseteo inmediato del hover tracker
-        ultimoElemento = null;
+    if (esCorrecto) {
+        speechSynthesis.speak(new SpeechSynthesisUtterance(itemSeleccionado.palabra));
+        elementoCard.classList.add('opacity-30', 'pointer-events-none');
+        
+        // 🌟 FIJACIÓN PUNTERO CONGELADO: Reiniciar hover para que busque un nuevo elemento limpio
+        ultimoElemento = null; 
+        pasoFraseActual++;
 
-        juegoActivo = false;
-        setTimeout(() => {
-            juegoActivo = true;
-            generarNuevaRonda();
-        }, 2000);
+        if (pasoFraseActual === 3) {
+            aciertos++;
+            rachaActual++;
+            txtAciertos.textContent = aciertos;
+            txtRacha.textContent = rachaActual;
+
+            elementoCard.classList.add('animacion-correcto');
+            juegoFeedbackDiv.textContent = "🌟 ¡Excelente! Oración completada 🎉";
+            juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-green-500 animate-fade-in";
+            
+            setTimeout(() => {
+                speechSynthesis.speak(new SpeechSynthesisUtterance(datosRondaActual.fraseLectura));
+            }, 600);
+
+            juegoActivo = false;
+            setTimeout(() => {
+                juegoActivo = true;
+                generarNuevaRondaOracion();
+            }, 3500);
+        }
     } else {
         rachaActual = 0;
         txtRacha.textContent = rachaActual;
 
         elementoCard.classList.add('animacion-incorrecto');
-        juegoFeedbackDiv.textContent = "💪 Inténtalo otra vez, ¡tú puedes!";
+        juegoFeedbackDiv.textContent = "💪 Inténtalo otra vez, ¡sigue el orden de la frase!";
         juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-orange-500 animate-fade-in";
-        speechSynthesis.speak(new SpeechSynthesisUtterance("Inténtalo otra vez, ¡tú puedes!"));
+        speechSynthesis.speak(new SpeechSynthesisUtterance("Inténtalo otra vez"));
 
         setTimeout(() => {
             elementoCard.classList.remove('animacion-incorrecto');
@@ -360,6 +453,7 @@ function verificarRespuesta(palabraSeleccionada, elementoCard) {
 ========================================= */
 const canvasElement = document.getElementById("canvasCam");
 const canvasCtx = canvasElement.getContext("2d");
+const cursorVirtual = document.getElementById("cursorVirtual");
 
 let rostroX = window.innerWidth / 2;
 let rostroY = window.innerHeight / 2;
@@ -369,7 +463,7 @@ let suavizadoY = rostroY;
 let ultimoElemento = null;
 let hoverInicio = 0;
 const TIEMPO_HOVER = 1200;
-const TIEMPO_COOLDOWN = 3000;
+const TIEMPO_COOLDOWN = 1500; // Reducido para agilizar clics entre diferentes ítems
 const cooldownMap = new Map();
 
 const faceMesh = new FaceMesh({
