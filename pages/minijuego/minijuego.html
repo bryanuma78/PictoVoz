@@ -7,11 +7,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- MEDIAPIPE -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
-    <!-- ESTILOS ADICIONALES PARA ANIMACIONES DEL JUEGO -->
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -40,22 +38,18 @@
 
 <body id="body-context" class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center overflow-x-hidden min-h-screen transition-colors duration-300">
 
-<!-- NAVBAR RESPONSIVE (Control dinámico por IDs) -->
 <nav id="navbar-context" class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300">
   <div class="flex justify-between items-center">
 
-    <!-- LOGO -->
     <div class="flex items-center gap-3 text-white font-bold text-xl">
       <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
       <span id="lblBrandName" class="text-xl md:text-2xl">PictoVoz</span>
     </div>
 
-    <!-- BOTON MENU MOBILE -->
     <button id="menu-btn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
       ☰
     </button>
 
-    <!-- MENU DESKTOP -->
     <div class="hidden md:flex items-center gap-4 text-white">
       <span id="bienvenida" class="font-black text-sm md:text-base tracking-wide">Cargando perfil...</span>
       <a href="/pages/menu/teclado-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menú</a>
@@ -66,7 +60,6 @@
 
   </div>
 
-  <!-- MENU MOBILE -->
   <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
     <span id="bienvenida-mobile" class="font-bold text-center text-lg">Cargando perfil...</span>
     <a href="/pages/menu/teclado-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition text-center">Menú</a>
@@ -76,11 +69,9 @@
   </div>
 </nav>
 
-<!-- SECCIÓN PRINCIPAL: TECLADO -->
 <section class="mt-6 px-2 md:px-4">
     <h2 class="text-2xl md:text-3xl font-extrabold text-gray-700">MINIJUEGO DE PICTOGRAMAS</h2>
 
-    <!-- CONTROLES (Bordes dinámicos controlados por ID) -->
     <div class="mt-6 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
         <input id="input-busqueda" placeholder="Ej: Manzana" class="px-4 py-3 rounded-2xl border-2 border-green-300 w-full sm:w-64 text-lg outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300"/>
         <button id="btn-agregar" class="bg-blue-400 hover:bg-blue-500 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">🔍 Buscar</button>
@@ -90,45 +81,35 @@
         <button id="btn-puntero" class="bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-2xl text-white font-bold w-full sm:w-auto shadow-md transition">🖱️ Desactivar Puntero</button>
     </div>
 
-    <!-- MENSAJE TOAST -->
     <div id="mensaje-modo" class="mt-4 hidden text-white font-bold px-4 py-2 rounded-xl shadow-md max-w-md mx-auto"></div>
 
-    <!-- RESULTADOS -->
     <div id="resultados-busqueda" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-4xl mx-auto mt-6"></div>
 
-    <!-- TECLADO -->
     <div id="contenedor-pictogramas" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-4 md:gap-6 mt-10 px-2"></div>
 </section>
 
-<!-- SECCIÓN DEL MINIJUEGO INTERACTIVO -->
 <section id="seccion-juego" class="mt-16 mx-auto max-w-4xl px-4 pb-16">
     <div id="card-juego" class="bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300">
         <h2 id="title-juego" class="text-xl sm:text-3xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender!</h2>
         <p class="text-gray-600 mb-6 font-semibold">Practica el uso del puntero seleccionando el pictograma correcto</p>
 
-        <!-- PANTALLA DE INICIO -->
         <div id="juego-inicio" class="py-6">
             <button id="btn-iniciar-juego" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-105 text-white font-black text-xl sm:text-2xl px-12 py-5 rounded-3xl shadow-lg transition-all">
                 🚀 ¡Empezar Juego!
             </button>
         </div>
 
-        <!-- PANTALLA PRINCIPAL DEL JUEGO (OCULTA AL INICIO) -->
         <div id="juego-pantalla" class="hidden animate-fade-in">
-            <!-- PREGUNTA -->
             <div id="bg-pregunta" class="bg-purple-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300">
                 <h3 class="text-xl md:text-3xl font-black text-purple-800">
                     ¿Cuál es el pictograma de: <span id="juego-pregunta" class="text-blue-600 underline">...</span>?
                 </h3>
             </div>
 
-            <!-- FEEDBACK EMOCIONAL -->
             <div id="juego-feedback" class="text-2xl font-bold mb-6 h-8 transition-all duration-300"></div>
 
-            <!-- CONTENEDOR DE LAS 3 OPCIONES -->
             <div id="juego-opciones" class="grid grid-cols-1 sm:grid-cols-3 gap-6 justify-center items-center max-w-2xl mx-auto"></div>
 
-            <!-- MARCADOR DE PUNTOS -->
             <div class="mt-8 flex justify-center gap-8 text-xl font-bold text-gray-700">
                 <p>✅ Aciertos: <span id="puntos-aciertos" class="text-green-500">0</span></p>
                 <p>⭐ Racha: <span id="puntos-racha" class="text-purple-500">0</span></p>
@@ -137,7 +118,6 @@
     </div>
 </section>
 
-<!-- MODAL ELIMINAR -->
 <div id="modal-eliminar" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50 p-4">
     <div class="bg-white rounded-3xl p-6 shadow-2xl text-center w-full max-w-sm">
         <h3 class="text-xl font-bold mb-3">🗑️ ¿Eliminar pictograma?</h3>
@@ -149,7 +129,6 @@
     </div>
 </div>
 
-<!-- CAMARA RESPONSIVE -->
 <div class="fixed top-20 left-2 md:left-4 z-40">
   <div class="relative">
     <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300" autoplay muted playsinline></video>
@@ -157,10 +136,8 @@
   </div>
 </div>
 
-<!-- CURSOR VIRTUAL -->
 <div id="cursorVirtual" class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75"></div>
 
-<!-- LÓGICA JAVASCRIPT INTEGRADA -->
 <script type="module">
 import { supabase } from '/pages/Login/supabase.js';
 
@@ -254,7 +231,6 @@ async function inicializarAutenticacionYEstilos() {
     videoCam.className = "rounded-2xl border-4 border-blue-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300";
 
     try {
-      // Consultar tabla relacional en Postgres vía cédula
       const { data: usuario, error } = await supabase
         .from('personal_institucional')
         .select('nombre')
@@ -266,7 +242,6 @@ async function inicializarAutenticacionYEstilos() {
       bienvenida.textContent = `Bienvenido, ${usuario.nombre}`;
       bienvenidaMobile.textContent = `Bienvenido, ${usuario.nombre}`;
       
-      // En entorno institucional usamos una clave unificada o dummy para simular el scope del usuario en pictogramas
       userId = cedulaInstitucional; 
       await cargar();
 
@@ -309,13 +284,18 @@ async function inicializarAutenticacionYEstilos() {
   }
 }
 
-/* SUPABASE - OPERACIONES BASE DE DATOS */
+/* SUPABASE - OPERACIONES BASE DE DATOS HÍBRIDAS */
 async function cargar(){
-  // Si es institucional, filtramos opcionalmente por cédula como identificador de perfil
-  const { data } = await supabase
-    .from('pictogramas_usuario')
-    .select('*')
-    .eq('user_id', userId);
+  let query = supabase.from('pictogramas_usuario').select('*');
+  
+  if (isInstitucional) {
+    query = query.eq('cedula_institucional', userId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
+
+  const { data, error } = await query;
+  if (error) console.error("Error al cargar:", error.message);
 
   pictogramas = [
     ...pictogramasDefecto,
@@ -325,13 +305,29 @@ async function cargar(){
 }
 
 async function guardarPictograma(p){
-  await supabase.from('pictogramas_usuario').insert([
-    { user_id:userId, palabra:p.palabra, img:p.img }
-  ]);
+  const payload = { palabra: p.palabra, img: p.img };
+  
+  if (isInstitucional) {
+    payload.cedula_institucional = userId;
+  } else {
+    payload.user_id = userId;
+  }
+
+  const { error } = await supabase.from('pictogramas_usuario').insert([payload]);
+  if (error) console.error("Error al guardar:", error.message);
 }
 
 async function eliminarPictogramaDB(p){
-  await supabase.from('pictogramas_usuario').delete().eq('user_id', userId).eq('palabra', p.palabra);
+  let query = supabase.from('pictogramas_usuario').delete().eq('palabra', p.palabra);
+  
+  if (isInstitucional) {
+    query = query.eq('cedula_institucional', userId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
+
+  const { error } = await query;
+  if (error) console.error("Error al eliminar:", error.message);
 }
 
 /* RENDERIZADO DEL TECLADO */
@@ -372,7 +368,15 @@ function renderizarPictogramas(){
       input.className=`mt-2 px-2 py-1 rounded-lg border-2 ${claseBordeInput} text-center w-[80px] md:w-[100px] text-sm`;
       input.onchange=async ()=>{
         pictogramas[index].palabra=input.value;
-        await supabase.from('pictogramas_usuario').update({ palabra:input.value }).eq('user_id',userId).eq('img',picto.img);
+        
+        let updateQuery = supabase.from('pictogramas_usuario').update({ palabra:input.value }).eq('img',picto.img);
+        if (isInstitucional) {
+          updateQuery = updateQuery.eq('cedula_institucional', userId);
+        } else {
+          updateQuery = updateQuery.eq('user_id', userId);
+        }
+        const { error } = await updateQuery;
+        if (error) console.error("Error al actualizar:", error.message);
       };
       cont.appendChild(input);
     }else{
@@ -422,12 +426,12 @@ btnPuntero.onclick = ()=>{
   punteroActivo = !punteroActivo;
   if(punteroActivo){
     cursorVirtual.style.display = "block";
-    videoElement.parentElement.style.display = "block";
+    videoCam.parentElement.style.display = "block";
     btnPuntero.innerHTML = "🖱️ Desactivar Puntero";
     mostrarMensajeModo("✅ Puntero activado", "bg-green-500");
   }else{
     cursorVirtual.style.display = "none";
-    videoElement.parentElement.style.display = "none";
+    videoCam.parentElement.style.display = "none";
     btnPuntero.innerHTML = "🖱️ Activar Puntero";
     mostrarMensajeModo("⛔ Puntero desactivado", "bg-red-500");
   }
@@ -551,7 +555,6 @@ function verificarRespuesta(palabraSeleccionada, elementoCard) {
 /* =========================================
    CÁMARA + ROSTRO (MEDIAPIPE INTERACTION)
 ========================================= */
-const videoElement = document.getElementById("videoCam");
 const canvasElement = document.getElementById("canvasCam");
 const canvasCtx = canvasElement.getContext("2d");
 const cursorVirtual = document.getElementById("cursorVirtual");
@@ -579,9 +582,9 @@ faceMesh.setOptions({
 });
 faceMesh.onResults(onResults);
 
-const camera = new Camera(videoElement, {
+const camera = new Camera(videoCam, {
   onFrame: async () => {
-    await faceMesh.send({ image: videoElement });
+    await faceMesh.send({ image: videoCam });
   },
   width: 640,
   height: 480
@@ -589,8 +592,8 @@ const camera = new Camera(videoElement, {
 camera.start();
 
 function onResults(results){
-  canvasElement.width = videoElement.videoWidth;
-  canvasElement.height = videoElement.videoHeight;
+  canvasElement.width = videoCam.videoWidth;
+  canvasElement.height = videoCam.videoHeight;
 
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -602,7 +605,6 @@ function onResults(results){
     const x = nose.x * canvasElement.width;
     const y = nose.y * canvasElement.height;
 
-    // Adaptar color del recuadro del tracker de la cámara según el entorno
     canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00";
     canvasCtx.lineWidth=4;
     canvasCtx.strokeRect(x-40, y-40, 80, 80);
@@ -616,7 +618,6 @@ function onResults(results){
     cursorVirtual.style.left = `${suavizadoX}px`;
     cursorVirtual.style.top = `${suavizadoY}px`;
 
-    // Cambiar el color del cursor virtual si es institucional
     if(isInstitucional) {
       cursorVirtual.classList.remove("bg-green-500");
       cursorVirtual.classList.add("bg-blue-500");
@@ -671,7 +672,6 @@ function ejecutarClick(elemento){
   elemento.click();
 }
 
-// Inicializar el guardrail de autenticación y los contextos gráficos
 inicializarAutenticacionYEstilos();
 
 </script>

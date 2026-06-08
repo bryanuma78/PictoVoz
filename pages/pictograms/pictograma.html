@@ -215,12 +215,18 @@ async function inicializarAutenticacionYEstilos() {
   }
 }
 
-/* SUPABASE - OPERACIONES BASE DE DATOS */
+/* SUPABASE - OPERACIONES BASE DE DATOS HÍBRIDAS */
 async function cargar(){
-  const { data } = await supabase
-    .from('pictogramas_usuario')
-    .select('*')
-    .eq('user_id', userId);
+  let query = supabase.from('pictogramas_usuario').select('*');
+  
+  if (isInstitucional) {
+    query = query.eq('cedula_institucional', userId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
+
+  const { data, error } = await query;
+  if (error) console.error("Error al cargar:", error.message);
 
   pictogramas = [
     ...pictogramasDefecto,
@@ -230,13 +236,29 @@ async function cargar(){
 }
 
 async function guardarPictograma(p){
-  await supabase.from('pictogramas_usuario').insert([
-    { user_id:userId, palabra:p.palabra, img:p.img }
-  ]);
+  const payload = { palabra: p.palabra, img: p.img };
+  
+  if (isInstitucional) {
+    payload.cedula_institucional = userId;
+  } else {
+    payload.user_id = userId;
+  }
+
+  const { error } = await supabase.from('pictogramas_usuario').insert([payload]);
+  if (error) console.error("Error al guardar:", error.message);
 }
 
 async function eliminarPictogramaDB(p){
-  await supabase.from('pictogramas_usuario').delete().eq('user_id', userId).eq('palabra', p.palabra);
+  let query = supabase.from('pictogramas_usuario').delete().eq('palabra', p.palabra);
+  
+  if (isInstitucional) {
+    query = query.eq('cedula_institucional', userId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
+
+  const { error } = await query;
+  if (error) console.error("Error al eliminar:", error.message);
 }
 
 /* RENDERIZADO DEL TECLADO */
@@ -277,7 +299,15 @@ function renderizarPictogramas(){
       input.className=`mt-2 px-2 py-1 rounded-lg border-2 ${claseBordeInput} text-center w-[80px] md:w-[100px] text-sm`;
       input.onchange=async ()=>{
         pictogramas[index].palabra=input.value;
-        await supabase.from('pictogramas_usuario').update({ palabra:input.value }).eq('user_id',userId).eq('img',picto.img);
+        
+        let updateQuery = supabase.from('pictogramas_usuario').update({ palabra:input.value }).eq('img',picto.img);
+        if (isInstitucional) {
+          updateQuery = updateQuery.eq('cedula_institucional', userId);
+        } else {
+          updateQuery = updateQuery.eq('user_id', userId);
+        }
+        const { error } = await updateQuery;
+        if (error) console.error("Error al actualizar:", error.message);
       };
       cont.appendChild(input);
     }else{
@@ -327,12 +357,12 @@ btnPuntero.onclick = ()=>{
   punteroActivo = !punteroActivo;
   if(punteroActivo){
     cursorVirtual.style.display = "block";
-    videoElement.parentElement.style.display = "block";
+    videoCam.parentElement.style.display = "block";
     btnPuntero.innerHTML = "🖱️ Desactivar Puntero";
     mostrarMensajeModo("✅ Puntero activado", "bg-green-500");
   }else{
     cursorVirtual.style.display = "none";
-    videoElement.parentElement.style.display = "none";
+    videoCam.parentElement.style.display = "none";
     btnPuntero.innerHTML = "🖱️ Activar Puntero";
     mostrarMensajeModo("⛔ Puntero desactivado", "bg-red-500");
   }
@@ -381,7 +411,6 @@ btnAgregar.onclick=async ()=>{
 /* =========================================
    CÁMARA + ROSTRO (MEDIAPIPE INTERACTION)
 ========================================= */
-const videoElement = document.getElementById("videoCam");
 const canvasElement = document.getElementById("canvasCam");
 const canvasCtx = canvasElement.getContext("2d");
 const cursorVirtual = document.getElementById("cursorVirtual");
@@ -409,9 +438,9 @@ faceMesh.setOptions({
 });
 faceMesh.onResults(onResults);
 
-const camera = new Camera(videoElement, {
+const camera = new Camera(videoCam, {
   onFrame: async () => {
-    await faceMesh.send({ image: videoElement });
+    await faceMesh.send({ image: videoCam });
   },
   width: 640,
   height: 480
@@ -419,8 +448,8 @@ const camera = new Camera(videoElement, {
 camera.start();
 
 function onResults(results){
-  canvasElement.width = videoElement.videoWidth;
-  canvasElement.height = videoElement.videoHeight;
+  canvasElement.width = videoCam.videoWidth;
+  canvasElement.height = videoCam.videoHeight;
 
   canvasCtx.save();
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -432,7 +461,6 @@ function onResults(results){
     const x = nose.x * canvasElement.width;
     const y = nose.y * canvasElement.height;
 
-    // Adaptar color del recuadro del tracker según el entorno (Azul o Verde)
     canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00";
     canvasCtx.lineWidth=4;
     canvasCtx.strokeRect(x-40, y-40, 80, 80);
@@ -446,7 +474,6 @@ function onResults(results){
     cursorVirtual.style.left = `${suavizadoX}px`;
     cursorVirtual.style.top = `${suavizadoY}px`;
 
-    // Cambiar el color del cursor virtual si es institucional
     if(isInstitucional) {
       cursorVirtual.classList.remove("bg-green-500");
       cursorVirtual.classList.add("bg-blue-500");
@@ -500,7 +527,6 @@ function ejecutarClick(elemento){
   elemento.click();
 }
 
-// Inicializar el guardrail de autenticación y los contextos gráficos
 inicializarAutenticacionYEstilos();
 
 </script>
