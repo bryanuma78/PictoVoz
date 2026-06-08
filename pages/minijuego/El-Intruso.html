@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PictoVoz - El Intruso (Pantalla Única Seguro)</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animacion-correcto {
+            animation: pulseGreen 0.5s ease-in-out;
+        }
+        .animacion-incorrecto {
+            animation: shakeRed 0.5s ease-in-out;
+        }
+        @keyframes pulseGreen {
+            0%, 100% { transform: scale(1); border-color: #22c55e; }
+            50% { transform: scale(1.05); border-color: #16a34a; background-color: #f0fdf4; }
+        }
+        @keyframes shakeRed {
+            0%, 100% { transform: translateX(0); border-color: #ef4444; }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+
+<body id="body-context" class="font-sans bg-gradient-to-b from-green-100 to-blue-100 text-center min-h-screen h-screen overflow-hidden transition-colors duration-300 flex flex-col">
+
+<nav id="navbar-context" class="bg-gradient-to-r from-green-500 to-green-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300 flex-none">
+  <div class="flex justify-between items-center">
+
+    <div class="flex items-center gap-3 text-white font-bold text-xl">
+      <img src="/images/pictovoz.png" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-md"/>
+      <span id="lblBrandName" class="text-xl md:text-2xl">PictoVoz</span>
+    </div>
+
+    <button id="menu-btn" class="md:hidden text-white text-4xl font-bold transition hover:scale-110">
+      ☰
+    </button>
+
+    <div class="hidden md:flex items-center gap-4 text-white">
+      <span id="bienvenida" class="font-black text-sm md:text-base tracking-wide">Cargando perfil...</span>
+      <a href="/pages/menu/minijuego-menu.html" class="hover:bg-white/20 px-4 py-2 rounded-xl transition font-bold">Menú</a>
+      <button id="cerrar-sesion-btn" class="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-2xl font-bold shadow-md transition">
+        Cerrar Sesión
+      </button>
+    </div>
+
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden flex-col mt-5 gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white animate-fade-in">
+    <span id="bienvenida-mobile" class="font-bold text-center text-lg">Cargando perfil...</span>
+    <a href="/pages/menu/minijuego-menu.html" class="bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition text-center">Menú</a>
+    <button id="cerrar-sesion-btn-mobile" class="bg-red-400 hover:bg-red-500 py-3 rounded-2xl font-bold shadow-md transition">
+      Cerrar Sesión
+    </button>
+  </div>
+</nav>
+
+<main class="flex-1 grid grid-cols-1 md:grid-cols-4 p-4 gap-4 overflow-hidden min-h-0">
+    
+    <div class="md:col-span-1 flex flex-row md:flex-col justify-center items-center gap-4 bg-white/40 backdrop-blur-sm p-3 rounded-3xl border border-white/40 shadow-lg flex-none md:h-full">
+        <div class="relative w-28 h-24 sm:w-36 sm:h-28 md:w-full md:max-w-[200px] md:aspect-video rounded-2xl border-4 border-green-400 overflow-hidden shadow-md bg-black flex-none">
+            <video id="videoCam" class="w-full h-full object-cover" autoplay muted playsinline></video>
+            <canvas id="canvasCam" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+        </div>
+        <button id="btn-puntero" class="bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-2xl text-white font-bold shadow-md transition-all flex items-center gap-2 text-lg whitespace-nowrap">
+            🖱️ <span>Desactivar Puntero</span>
+        </button>
+    </div>
+
+    <div id="card-juego" class="md:col-span-3 bg-white rounded-3xl shadow-xl p-6 border-4 border-purple-300 flex flex-col justify-between overflow-hidden h-full min-h-0 transition-all duration-300">
+        
+        <div class="flex-none">
+            <h2 id="title-juego" class="text-xl sm:text-3xl font-extrabold text-purple-600 mb-2">🕵️‍♂️ ¡Encuentra al Intruso!</h2>
+            <p class="text-gray-600 font-semibold text-sm sm:text-base">Selecciona el pictograma que NO pertenece a la familia</p>
+        </div>
+
+        <div id="juego-inicio" class="flex-1 flex items-center justify-center">
+            <button id="btn-iniciar-juego" class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:scale-105 text-white font-black text-xl sm:text-2xl px-12 py-5 rounded-3xl shadow-lg transition-all">
+                🚀 ¡Empezar a Jugar!
+            </button>
+        </div>
+
+        <div id="juego-pantalla" class="hidden flex-1 flex flex-col justify-between min-h-0 animate-fade-in pt-2">
+            <div id="bg-pregunta" class="bg-purple-100 rounded-2xl py-4 px-6 shadow-sm transition-all duration-300 inline-block mx-auto flex-none">
+                <h3 class="text-lg md:text-2xl font-black text-purple-800">
+                    Familia de los: <span id="juego-pregunta" class="text-blue-600 underline">...</span>
+                </h3>
+            </div>
+
+            <div id="juego-feedback" class="text-2xl font-bold h-8 my-2 flex items-center justify-center transition-all duration-300"></div>
+
+            <div id="juego-opciones" class="flex-1 grid grid-cols-2 gap-4 items-center justify-center p-2 max-w-lg w-full mx-auto min-h-0 overflow-hidden"></div>
+
+            <div class="flex justify-center gap-8 text-xl font-bold text-gray-700 border-t pt-4 flex-none">
+                <p>✅ Aciertos: <span id="puntos-aciertos" class="text-green-500">0</span></p>
+                <p>⭐ Racha: <span id="puntos-racha" class="text-purple-500">0</span></p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="cursorVirtual" class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75"></div>
+
+<script type="module">
+import { supabase } from '/pages/Login/supabase.js';
+
+/* ====================================================================
+   🛡️ FILTRO DE SEGURIDAD DE PALABRAS CLAVE (Lista Negra Obligatoria)
+   ==================================================================== */
+const listaNegraSeguridad = [
+    "regla", "periodo", "menstruacion", "compresa", "tampon", "toalla femenina", 
+    "sexo", "desnudo", "violencia", "sangre", "droga", "alcohol", "cigarro",
+    "banco", "dinero", "apuesta", "muerte", "arma", "matar"
+];
+
+function esPalabraSegura(palabra) {
+    if (!palabra) return false;
+    const palabraNormalizada = palabra.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const estaEnListaNegra = listaNegraSeguridad.some(termino => {
+        const terminoNormalizado = termino.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return palabraNormalizada.includes(terminoNormalizado);
+    });
+    return !estaEnListaNegra;
+}
+
+/* ELEMENTOS DEL CONTEXTO DINÁMICO */
+const bodyContext = document.getElementById('body-context');
+const navbarContext = document.getElementById('navbar-context');
+const lblBrandName = document.getElementById('lblBrandName');
+const cardJuego = document.getElementById('card-juego');
+const titleJuego = document.getElementById('title-juego');
+const bgPregunta = document.getElementById('bg-pregunta');
+const videoCam = document.getElementById('videoCam');
+
+/* DOM GENERALES */
+const bienvenida = document.getElementById('bienvenida');
+const bienvenidaMobile = document.getElementById('bienvenida-mobile');
+const cerrarBtn = document.getElementById('cerrar-sesion-btn');
+const cerrarBtnMobile = document.getElementById('cerrar-sesion-btn-mobile');
+const menuBtn = document.getElementById('menu-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const btnPuntero = document.getElementById('btn-puntero');
+
+/* ELEMENTOS DEL JUEGO */
+const juegoInicioDiv = document.getElementById('juego-inicio');
+const juegoPantallaDiv = document.getElementById('juego-pantalla');
+const btnIniciarJuego = document.getElementById('btn-iniciar-juego');
+const juegoPreguntaSpan = document.getElementById('juego-pregunta');
+const juegoOpcionesDiv = document.getElementById('juego-opciones');
+const juegoFeedbackDiv = document.getElementById('juego-feedback');
+const txtAciertos = document.getElementById('puntos-aciertos');
+const txtRacha = document.getElementById('puntos-racha');
+
+/* VARIABLES DE ESTADO */
+let userId = null;
+let punteroActivo = true;
+let isInstitucional = false;
+
+let juegoActivo = false;
+let aciertos = 0;
+let rachaActual = 0;
+let palabraIntrusaCorrecta = "";
+
+/* FAMILIAS SEMÁNTICAS COHERENTES Y FILTRADAS */
+const familiasSemanticas = [
+    { nombre: "ANIMALES", correctas: ["Perro", "Gato", "León", "Elefante", "Mono", "Oso"], intruso: "Plátano" },
+    { nombre: "FRUTAS", correctas: ["Manzana", "Plátano", "Naranja", "Uva", "Fresa", "Piña"], intruso: "Cuaderno" },
+    { nombre: "ÚTILES ESCOLARES", correctas: ["Cuaderno", "Lápiz", "Pizarra", "Goma", "Mochila"], intruso: "Perro" },
+    { nombre: "MUEBLES DEL HOGAR", correctas: ["Mesa", "Silla", "Cama", "Sofá", "Armario"], intruso: "Sopa" },
+    { nombre: "ALIMENTOS", correctas: ["Sopa", "Pescado", "Leche", "Arroz", "Pan", "Queso"], intruso: "Carro" }
+];
+
+/* AUTENTICACIÓN HÍBRIDA & ESTILOS CONDICIONALES */
+async function inicializarAutenticacionYEstilos() {
+  const cedulaInstitucional = localStorage.getItem("user_cedula");
+
+  if (cedulaInstitucional) {
+    isInstitucional = true;
+    bodyContext.className = "font-sans bg-gradient-to-b from-blue-100 to-indigo-100 text-center min-h-screen h-screen overflow-hidden transition-colors duration-300 flex flex-col";
+    navbarContext.className = "bg-gradient-to-r from-blue-600 to-blue-400 shadow-xl rounded-b-3xl px-4 py-4 sticky top-0 z-50 transition-all duration-300 flex-none";
+    lblBrandName.textContent = "PictoVoz Institucional";
+    cardJuego.className = "md:col-span-3 bg-white rounded-3xl shadow-xl p-6 border-4 border-blue-300 flex flex-col justify-between overflow-hidden h-full min-h-0";
+    titleJuego.className = "text-xl sm:text-3xl font-extrabold text-blue-600 mb-2";
+    bgPregunta.className = "bg-blue-100 rounded-2xl py-4 px-6 shadow-sm transition-all duration-300 inline-block mx-auto flex-none";
+    videoCam.parentElement.className = "relative w-28 h-24 sm:w-36 sm:h-28 md:w-full md:max-w-[200px] md:aspect-video rounded-2xl border-4 border-blue-400 overflow-hidden shadow-md bg-black flex-none";
+
+    try {
+      const { data: usuario, error } = await supabase.from('personal_institucional').select('nombre').eq('cedula', cedulaInstitucional).single();
+      if (error || !usuario) throw new Error("Cédula Inválida");
+      bienvenida.textContent = `Bienvenido, ${usuario.nombre}`;
+      bienvenidaMobile.textContent = `Bienvenido, ${usuario.nombre}`;
+      userId = cedulaInstitucional; 
+    } catch (err) {
+      localStorage.removeItem("user_cedula");
+      location.href = '/pages/Login/login.html';
+    }
+  } else {
+    isInstitucional = false;
+    try{
+      const { data, error } = await supabase.auth.getUser();
+      if(error) throw error;
+      const user = data?.user;
+      if(user){
+        userId = user.id;
+        const nombre = user.user_metadata?.full_name || user.email;
+        bienvenida.textContent = `Bienvenido, ${nombre}`;
+        bienvenidaMobile.textContent = `Bienvenido, ${nombre}`;
+      }else{
+        location.href='/pages/Login/login.html';
+      }
+    }catch(err){
+      location.href='/pages/Login/login.html';
+    }
+  }
+}
+
+/* API DE ARASAAC CON COGUÍA DE SEGURIDAD */
+async function buscarImagenEnArasaac(palabra) {
+    if (!esPalabraSegura(palabra)) {
+        return "https://via.placeholder.com/150?text=Bloqueado";
+    }
+    try {
+        const res = await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(palabra.toLowerCase())}`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+            return `https://static.arasaac.org/pictograms/${data[0]._id}/${data[0]._id}_300.png`;
+        }
+    } catch (e) { console.error(e); }
+    return "https://via.placeholder.com/150?text=Error";
+}
+
+/* INTERRUPTOR PUNTERO */
+btnPuntero.onclick = () => {
+  punteroActivo = !punteroActivo;
+  if(punteroActivo){
+    cursorVirtual.style.display = "block";
+    videoCam.parentElement.style.display = "block";
+    btnPuntero.querySelector('span').textContent = "Desactivar Puntero";
+    btnPuntero.className = "bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-2xl text-white font-bold shadow-md transition-all flex items-center gap-2 text-lg whitespace-nowrap";
+  }else{
+    cursorVirtual.style.display = "none";
+    videoCam.parentElement.style.display = "none";
+    btnPuntero.querySelector('span').textContent = "Activar Puntero";
+    btnPuntero.className = "bg-green-500 hover:bg-green-600 px-6 py-3 rounded-2xl text-white font-bold shadow-md transition-all flex items-center gap-2 text-lg whitespace-nowrap";
+  }
+};
+
+/* LOGOUT */
+const cerrarSesion = async () => {
+  localStorage.removeItem("user_cedula");
+  await supabase.auth.signOut();
+  location.href='/pages/Login/login.html';
+};
+cerrarBtn.onclick = cerrarSesion;
+cerrarBtnMobile.onclick = cerrarSesion;
+menuBtn.onclick = () => { mobileMenu.classList.toggle('hidden'); mobileMenu.classList.toggle('flex'); };
+
+/* =========================================
+   🕵️‍♂️ GENERADOR DE RONDAS
+========================================= */
+btnIniciarJuego.onclick = () => {
+    juegoInicioDiv.classList.add('hidden');
+    juegoPantallaDiv.classList.remove('hidden'); // 🌟 CORREGIDO: Llamada limpia al div correcto
+    juegoActivo = true;
+    generarRondaIntruso();
+};
+
+async function generarRondaIntruso() {
+    juegoFeedbackDiv.textContent = "";
+    juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 flex items-center justify-center";
+    juegoOpcionesDiv.innerHTML = "<p class='col-span-full text-center py-4 text-purple-600 font-bold animate-pulse text-lg'>Cargando Arasaac Seguro...</p>";
+
+    const familiaActual = familiasSemanticas[Math.floor(Math.random() * familiasSemanticas.length)];
+    juegoPreguntaSpan.textContent = familiaActual.nombre;
+
+    const correctasElegidas = [...familiaActual.correctas].sort(() => 0.5 - Math.random()).slice(0, 3);
+    palabraIntrusaCorrecta = familiaActual.intruso;
+
+    const [img1, img2, img3, imgIntruso] = await Promise.all([
+        buscarImagenEnArasaac(correctasElegidas[0]),
+        buscarImagenEnArasaac(correctasElegidas[1]),
+        buscarImagenEnArasaac(correctasElegidas[2]),
+        buscarImagenEnArasaac(palabraIntrusaCorrecta)
+    ]);
+
+    const opcionesRonda = [
+        { palabra: correctasElegidas[0], img: img1, esIntruso: false },
+        { palabra: correctasElegidas[1], img: img2, esIntruso: false },
+        { palabra: correctasElegidas[2], img: img3, esIntruso: false },
+        { palabra: palabraIntrusaCorrecta, img: imgIntruso, esIntruso: true }
+    ].sort(() => 0.5 - Math.random());
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(`Busca el intruso en los ${familiaActual.nombre.toLowerCase()}`));
+
+    juegoOpcionesDiv.innerHTML = "";
+    const claseBordeCard = isInstitucional ? 'border-blue-200' : 'border-purple-200';
+
+    opcionesRonda.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-4 cursor-pointer transition-all flex flex-col items-center justify-center w-full h-full max-h-[150px] sm:max-h-[180px] aspect-square mx-auto min-h-0`;
+        card.innerHTML = `
+            <img src="${item.img}" data-palabra="${item.palabra}" class="w-[75%] h-[75%] object-contain min-h-0 flex-none pictograma-img">
+            <span class="text-xs font-black text-gray-500 mt-1 uppercase truncate max-w-full">${item.palabra}</span>
+        `;
+        
+        card.onclick = () => verificarSeleccionIntruso(item.esIntruso, card);
+        juegoOpcionesDiv.appendChild(card);
+    });
+}
+
+function verificarSeleccionIntruso(esIntruso, elementoCard) {
+    if (!juegoActivo) return;
+    speechSynthesis.cancel();
+
+    if (esIntruso) {
+        aciertos++; rachaActual++;
+        txtAciertos.textContent = aciertos; txtRacha.textContent = rachaActual;
+
+        elementoCard.classList.add('animacion-correcto');
+        juegoFeedbackDiv.textContent = `🎯 ¡Logrado! Es ${palabraIntrusaCorrecta.toUpperCase()} 🔍`;
+        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-green-500 animate-fade-in flex items-center justify-center";
+        speechSynthesis.speak(new SpeechSynthesisUtterance(`¡Excelente! El intruso era ${palabraIntrusaCorrecta}`));
+
+        ultimoElemento = null;
+
+        juegoActivo = false;
+        setTimeout(() => {
+            juegoActivo = true;
+            generarRondaIntruso();
+        }, 2200);
+    } else {
+        rachaActual = 0; txtRacha.textContent = rachaActual;
+
+        elementoCard.classList.add('animacion-incorrecto');
+        juegoFeedbackDiv.textContent = "💪 ¡Inténtalo otra vez! ¡Tú puedes!";
+        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-orange-500 animate-fade-in flex items-center justify-center";
+        speechSynthesis.speak(new SpeechSynthesisUtterance("Inténtalo otra vez"));
+
+        setTimeout(() => { elementoCard.classList.remove('animacion-incorrecto'); }, 600);
+    }
+}
+
+/* =========================================
+   CÁMARA + ROSTRO (MEDIAPIPE INTERACTION)
+========================================= */
+const canvasElement = document.getElementById("canvasCam");
+const canvasCtx = canvasElement.getContext("2d");
+const cursorVirtual = document.getElementById("cursorVirtual");
+
+let rostroX = window.innerWidth / 2;
+let rostroY = window.innerHeight / 2;
+let suavizadoX = rostroX;
+let suavizadoY = rostroY;
+
+let ultimoElemento = null;
+let hoverInicio = 0;
+const TIEMPO_HOVER = 1200;
+const TIEMPO_COOLDOWN = 2500;
+const cooldownMap = new Map();
+
+const faceMesh = new FaceMesh({
+  locateFile: (file)=> `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+});
+
+faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+faceMesh.onResults(onResults);
+
+const camera = new Camera(videoCam, {
+  onFrame: async () => { await faceMesh.send({ image: videoCam }); },
+  width: 640, height: 480
+});
+camera.start();
+
+function onResults(results){
+  canvasElement.width = videoCam.videoWidth;
+  canvasElement.height = videoCam.videoHeight;
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+  if(results.multiFaceLandmarks.length > 0 && punteroActivo){
+    const landmarks = results.multiFaceLandmarks[0];
+    const nose = landmarks[1];
+
+    const x = nose.x * canvasElement.width;
+    const y = nose.y * canvasElement.height;
+
+    canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00";
+    canvasCtx.lineWidth = 4;
+    canvasCtx.strokeRect(x-40, y-40, 80, 80);
+
+    rostroX = window.innerWidth - (nose.x * window.innerWidth);
+    rostroY = nose.y * window.innerHeight;
+
+    suavizadoX += (rostroX - suavizadoX) * 0.15;
+    suavizadoY += (rostroY - suavizadoY) * 0.15;
+
+    cursorVirtual.style.left = `${suavizadoX}px`;
+    cursorVirtual.style.top = `${suavizadoY}px`;
+
+    if(isInstitucional) {
+      cursorVirtual.classList.remove("bg-green-500"); cursorVirtual.classList.add("bg-blue-500");
+    } else {
+      cursorVirtual.classList.remove("bg-blue-500"); cursorVirtual.classList.add("bg-green-500");
+    }
+
+    detectarHover();
+  }
+  canvasCtx.restore();
+}
+
+function detectarHover(){
+  const elemento = document.elementFromPoint(suavizadoX, suavizadoY);
+  if(!elemento) return;
+
+  const esPictograma = elemento.tagName==="IMG" && elemento.closest("#juego-opciones");
+
+  if(!esPictograma){
+    ultimoElemento=null;
+    return;
+  }
+
+  if(elemento===ultimoElemento){
+    if(Date.now() - hoverInicio > TIEMPO_HOVER){
+      ejecutarClick(elemento);
+      hoverInicio = Date.now() + 999999;
+    }
+  }else{
+    ultimoElemento = elemento;
+    hoverInicio = Date.now();
+  }
+}
+
+function ejecutarClick(elemento){
+  const ahora = Date.now();
+  const ultimoClick = cooldownMap.get(elemento) || 0;
+  if(ahora - ultimoClick < TIEMPO_COOLDOWN) return;
+
+  cooldownMap.set(elemento, ahora);
+  elemento.style.transform="scale(1.25)";
+  elemento.style.transition="0.2s";
+  setTimeout(()=>{ elemento.style.transform=""; },300);
+
+  elemento.click();
+}
+
+inicializarAutenticacionYEstilos();
+</script>
+</body>
+</html>
