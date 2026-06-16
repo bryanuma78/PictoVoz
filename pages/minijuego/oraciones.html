@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PictoVoz - Minijuego de Oraciones</title>
+    <title>PictoVoz - Minijuego de Oraciones con Intérprete API</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
@@ -32,6 +31,10 @@
             0%, 100% { transform: translateX(0); border-color: #fca5a5; }
             20%, 60% { transform: translateX(-10px); }
             40%, 80% { transform: translateX(10px); }
+        }
+        /* Ajuste para que el widget de señas no tape tu diseño */
+        .v l-wrapper {
+            z-index: 40 !important;
         }
     </style>
 </head>
@@ -75,7 +78,7 @@
     </button>
 </section>
 
-<section id="seccion-juego" class="mt-8 mx-auto max-w-4xl px-4 pb-16">
+<section id="seccion-juego" class="mt-8 mx-auto max-w-5xl px-4 pb-16">
     <div id="card-juego" class="bg-white rounded-3xl shadow-2xl p-6 border-4 border-purple-300 transition-all duration-300">
         <h2 id="title-juego" class="text-2xl sm:text-4xl font-extrabold text-purple-600 mb-2">🎮 ¡A Jugar y Aprender Frases!</h2>
         <p class="text-gray-600 mb-6 font-semibold">Completa las palabras de la oración usando el puntero facial o haciendo clic</p>
@@ -93,24 +96,26 @@
                 </h3>
             </div>
 
-            <div class="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-8 bg-gray-50 p-4 rounded-3xl border-2 border-dashed border-gray-300 items-center">
-                <div class="flex flex-col items-center gap-1">
-                    <span id="conector-1" class="text-xs font-bold text-purple-500 tracking-wider">EL / LA</span>
-                    <div id="slot-sujeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Sujeto</div>
+            <div class="space-y-8 max-w-3xl mx-auto">
+                <div class="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-3xl border-2 border-dashed border-gray-300 items-center">
+                    <div class="flex flex-col items-center gap-1">
+                        <span id="label-bloque-1" class="text-xs font-bold text-purple-500 tracking-wider">PARTE 1</span>
+                        <div id="slot-sujeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center">Inicio</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <span id="label-bloque-2" class="text-xs font-bold text-purple-500 tracking-wider">PARTE 2</span>
+                        <div id="slot-accion" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center">Acción / Verbo</div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <span id="label-bloque-3" class="text-xs font-bold text-purple-500 tracking-wider">PARTE 3</span>
+                        <div id="slot-objeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center">Complemento</div>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center gap-1">
-                    <span class="text-xs font-bold text-purple-500 tracking-wider">&nbsp;</span>
-                    <div id="slot-accion" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Acción</div>
-                </div>
-                <div class="flex flex-col items-center gap-1">
-                    <span id="conector-2" class="text-xs font-bold text-purple-500 tracking-wider">UN / UNA</span>
-                    <div id="slot-objeto" class="w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner">Objeto</div>
-                </div>
+
+                <div id="juego-feedback" class="text-2xl font-bold h-8 transition-all duration-300"></div>
+
+                <div id="juego-opciones" class="grid grid-cols-3 sm:grid-cols-6 gap-4 p-4 bg-purple-50/50 rounded-2xl"></div>
             </div>
-
-            <div id="juego-feedback" class="text-2xl font-bold mb-6 h-8 transition-all duration-300"></div>
-
-            <div id="juego-opciones" class="grid grid-cols-3 sm:grid-cols-6 gap-4 justify-center items-center max-w-3xl mx-auto p-4 bg-purple-50/50 rounded-2xl"></div>
 
             <div class="mt-8 flex justify-center gap-8 text-xl font-bold text-gray-700">
                 <p>✅ Aciertos: <span id="puntos-aciertos" class="text-green-500">0</span></p>
@@ -122,17 +127,30 @@
 
 <div class="fixed top-20 left-2 md:left-4 z-40">
   <div class="relative">
-    <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300" autoplay muted playsinline></video>
+    <video id="videoCam" class="rounded-2xl border-4 border-green-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black" autoplay muted playsinline></video>
     <canvas id="canvasCam" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
   </div>
 </div>
 
 <div id="cursorVirtual" class="fixed w-4 h-4 md:w-6 md:h-6 bg-green-500 rounded-full border-4 border-white shadow-xl z-[9999] pointer-events-none transition-all duration-75"></div>
 
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+    </div>
+</div>
+
+<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+<script>
+    // Inicialización del Widget de Señas Inteligente
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+</script>
+
 <script type="module">
 import { supabase } from '/pages/Login/supabase.js';
 
-/* ELEMENTOS DEL CONTEXTO DINÁMICO */
+/* ELEMENTOS DOM GENERALES */
 const bodyContext = document.getElementById('body-context');
 const navbarContext = document.getElementById('navbar-context');
 const lblBrandName = document.getElementById('lblBrandName');
@@ -141,7 +159,6 @@ const titleJuego = document.getElementById('title-juego');
 const bgPregunta = document.getElementById('bg-pregunta');
 const videoCam = document.getElementById('videoCam');
 
-/* ELEMENTOS DOM GENERALES */
 const bienvenida = document.getElementById('bienvenida');
 const bienvenidaMobile = document.getElementById('bienvenida-mobile');
 const cerrarBtn = document.getElementById('cerrar-sesion-btn');
@@ -160,8 +177,10 @@ const juegoFeedbackDiv = document.getElementById('juego-feedback');
 const txtAciertos = document.getElementById('puntos-aciertos');
 const txtRacha = document.getElementById('puntos-racha');
 
-const conector1Span = document.getElementById('conector-1');
-const conector2Span = document.getElementById('conector-2');
+const labelBloque1 = document.getElementById('label-bloque-1');
+const labelBloque2 = document.getElementById('label-bloque-2');
+const labelBloque3 = document.getElementById('label-bloque-3');
+
 const slotSujeto = document.getElementById('slot-sujeto');
 const slotAccion = document.getElementById('slot-accion');
 const slotObjeto = document.getElementById('slot-objeto');
@@ -176,40 +195,171 @@ let aciertos = 0;
 let rachaActual = 0;
 
 let pasoFraseActual = 0;
-let datosRondaActual = { sujeto: null, accion: null, objeto: null, fraseLectura: "", conectorSujeto: "", conectorObjeto: "" };
+let datosRondaActual = { bloque1: null, bloque2: null, bloque3: null, fraseCompleta: "" };
 
-/* DICCIONARIO SEMÁNTICO COHERENTE */
-const poolSujetos = [
-    { palabra: "Niño", genero: "M" }, { palabra: "Niña", genero: "F" }, 
-    { palabra: "Mamá", genero: "F" }, { palabra: "Papá", genero: "M" }, 
-    { palabra: "Profesor", genero: "M" }, { palabra: "Abuelo", genero: "M" }
+/* BANCO DE 100 ORACIONES OPTIMIZADAS */
+const bancoOraciones = [
+    { b1: "Yo", b2: "quiero", b3: "agua" },
+    { b1: "Yo", b2: "quiero", b3: "comida" },
+    { b1: "Yo", b2: "tengo", b3: "hambre" },
+    { b1: "Yo", b2: "tengo", b3: "sed" },
+    { b1: "Yo", b2: "estoy", b3: "feliz" },
+    { b1: "Yo", b2: "estoy", b3: "triste" },
+    { b1: "Yo", b2: "estoy", b3: "cansado" },
+    { b1: "Yo", b2: "voy a", b3: "la escuela" },
+    { b1: "Yo", b2: "juego en", b3: "el parque" },
+    { b1: "Yo", b2: "duerme en", b3: "mi cama" },
+    { b1: "Yo", b2: "como", b3: "pan" },
+    { b1: "Yo", b2: "como", b3: "fruta" },
+    { b1: "Yo", b2: "bebo", b3: "agua" },
+    { b1: "Yo", b2: "leo", b3: "un libro" },
+    { b1: "Yo", b2: "escribo en", b3: "el cuaderno" },
+    { b1: "Yo", b2: "dibuja", b3: "una casa" },
+    { b1: "Yo", b2: "pinto", b3: "un dibujo" },
+    { b1: "Yo", b2: "escucho", b3: "música" },
+    { b1: "Yo", b2: "miro", b3: "la televisión" },
+    { b1: "Yo", b2: "corro", b3: "rápido" },
+    { b1: "Mi mamá", b2: "cocina", b3: "comida" },
+    { b1: "Mi mamá", b2: "limpia", b3: "la casa" },
+    { b1: "Mi mamá", b2: "cuida al", b3: "bebé" },
+    { b1: "Mi papá", b2: "trabaja en", b3: "la oficina" },
+    { b1: "Mi papá", b2: "maneja", b3: "el coche" },
+    { b1: "Mi papá", b2: "lee", b3: "el periódico" },
+    { b1: "Mi hermano", b2: "juega", b3: "fútbol" },
+    { b1: "Mi hermana", b2: "estudia en", b3: "la escuela" },
+    { b1: "Mi familia", b2: "está en", b3: "casa" },
+    { b1: "Mi familia", b2: "come", b3: "junta" },
+    { b1: "El perro", b2: "corre en", b3: "el parque" },
+    { b1: "El gato", b2: "duerme en", b3: "la cama" },
+    { b1: "El pájaro", b2: "vuela en", b3: "el cielo" },
+    { b1: "El pez", b2: "nada en", b3: "el agua" },
+    { b1: "La vaca", b2: "está en", b3: "la granja" },
+    { b1: "El caballo", b2: "corre en", b3: "el campo" },
+    { b1: "La gallina", b2: "pone", b3: "huevos" },
+    { b1: "El pato", b2: "nada en", b3: "el lago" },
+    { b1: "El conejo", b2: "salta en", b3: "el campo" },
+    { b1: "El león", b2: "está en", b3: "el zoológico" },
+    { b1: "Yo", b2: "voy al", b3: "médico" },
+    { b1: "El médico", b2: "ayuda a las", b3: "personas" },
+    { b1: "El bombero", b2: "apaga", b3: "el fuego" },
+    { b1: "El policía", b2: "cuida", b3: "la ciudad" },
+    { b1: "El profesor", b2: "enseña en", b3: "la escuela" },
+    { b1: "El estudiante", b2: "aprende en", b3: "clase" },
+    { b1: "Yo", b2: "voy al", b3: "hospital" },
+    { b1: "Yo", b2: "estoy", b3: "enfermo" },
+    { b1: "Yo", b2: "tomo", b3: "medicina" },
+    { b1: "Yo", b2: "me siento", b3: "mejor" },
+    { b1: "Yo", b2: "me levanto", b3: "temprano" },
+    { b1: "Yo", b2: "me baño en", b3: "la ducha" },
+    { b1: "Yo", b2: "me cepillo", b3: "los dientes" },
+    { b1: "Yo", b2: "me lavo", b3: "las manos" },
+    { b1: "Yo", b2: "me visto en", b3: "la mañana" },
+    { b1: "Yo", b2: "me acuesto en", b3: "la noche" },
+    { b1: "Yo", b2: "hago", b3: "la tarea" },
+    { b1: "Yo", b2: "estudio", b3: "matemáticas" },
+    { b1: "Yo", b2: "aprende a", b3: "leer" },
+    { b1: "Yo", b2: "aprende a", b3: "escribir" },
+    { b1: "El sol", b2: "está", b3: "caliente" },
+    { b1: "La luna", b2: "está en", b3: "el cielo" },
+    { b1: "Llueve", b2: "mucho", b3: "hoy" },
+    { b1: "Hace", b2: "frío", b3: "hoy" },
+    { b1: "Hace", b2: "calor", b3: "hoy" },
+    { b1: "El viento", b2: "sopla", b3: "fuerte" },
+    { b1: "El cielo", b2: "está", b3: "azul" },
+    { b1: "Hay", b2: "nubes en", b3: "el cielo" },
+    { b1: "El arcoíris", b2: "es", b3: "bonito" },
+    { b1: "La tormenta", b2: "es", b3: "fuerte" },
+    { b1: "Yo", b2: "juego con", b3: "mis amigos" },
+    { b1: "Mis amigos", b2: "son", b3: "buenos" },
+    { b1: "Yo", b2: "comparto", b3: "mis juguetes" },
+    { b1: "Yo", b2: "ayudo a", b3: "mi amigo" },
+    { b1: "Yo", b2: "saludo a", b3: "mi maestro" },
+    { b1: "Yo", b2: "respeto a las", b3: "personas" },
+    { b1: "Yo", b2: "escucho al", b3: "profesor" },
+    { b1: "Yo", b2: "hablo con", b3: "mi familia" },
+    { b1: "Yo", b2: "sonrío", b3: "mucho" },
+    { b1: "Yo", b2: "estoy", b3: "contento" },
+    { b1: "Yo", b2: "voy al", b3: "parque" },
+    { b1: "Yo", b2: "voy al", b3: "supermercado" },
+    { b1: "Yo", b2: "compro", b3: "pan" },
+    { b1: "Yo", b2: "compro", b3: "fruta" },
+    { b1: "Yo", b2: "pago con", b3: "dinero" },
+    { b1: "Yo", b2: "llevo", b3: "una mochila" },
+    { b1: "Yo", b2: "abro", b3: "la puerta" },
+    { b1: "Yo", b2: "cierro", b3: "la ventana" },
+    { b1: "Yo", b2: "subo", b3: "las escaleras" },
+    { b1: "Yo", b2: "bajo", b3: "las escaleras" },
+    { b1: "El niño", b2: "juega con", b3: "la pelota" },
+    { b1: "La niña", b2: "canta", b3: "una canción" },
+    { b1: "El bebé", b2: "llora", b3: "." },
+    { b1: "El bebé", b2: "duerme", b3: "." },
+    { b1: "La familia", b2: "viaja en", b3: "coche" },
+    { b1: "El tren", b2: "llega a", b3: "la estación" },
+    { b1: "El avión", b2: "vuela", b3: "alto" },
+    { b1: "El barco", b2: "está en", b3: "el mar" },
+    { b1: "Yo", b2: "soy feliz con", b3: "mi familia" },
+    { b1: "Yo", b2: "quiero", b3: "aprender más" }
 ];
 
-const contextosOraciones = [
-    {
-        acciones: ["Come", "Bebe", "Corta"],
-        objetos: [
-            { palabra: "Manzana", genero: "F" }, { palabra: "Agua", genero: "F" }, 
-            { palabra: "Sopa", genero: "F" }, { palabra: "Plátano", genero: "M" }
-        ]
-    },
-    {
-        acciones: ["Mira", "Dibuja", "Lee"],
-        objetos: [
-            { palabra: "Libro", genero: "M" }, { palabra: "Cuaderno", genero: "M" }, 
-            { palabra: "Pizarra", genero: "F" }, { palabra: "Pintura", genero: "F" }
-        ]
-    },
-    {
-        acciones: ["Juega", "Lava", "Busca"],
-        objetos: [
-            { palabra: "Pelota", genero: "F" }, { palabra: "Carro", genero: "M" }, 
-            { palabra: "Juguete", genero: "M" }, { palabra: "Gato", genero: "M" }
-        ]
+const mapeoPalabrasGlobal = {
+    "abro": "abrir", "cierro": "cerrar", "como": "comer", "bebo": "beber", "juego": "jugar", "miro": "mirar",
+    "leo": "leer", "escribo": "escribir", "pinto": "pintar", "dibujo": "dibujar", "corro": "correr",
+    "escucho": "escuchar", "compro": "comprar", "pago": "pagar", "subo": "subir", "bajo": "bajar",
+    "llevo": "llevar", "hago": "hacer", "estudio": "estudiar", "sonrío": "sonreír", "hablo": "hablar",
+    "comparto": "compartir", "quiero": "querer", "tengo": "tener", "estoy": "estar", "voy a": "ir",
+    "juego en": "jugar", "duerme en": "dormir", "escribo en": "escribir", "cuida al": "cuidador",
+    "trabaja en": "trabajar", "estudia en": "estudiar", "está en": "estar", "corre en": "correr", "vuela en": "volar",
+    "nada en": "nadar", "salta en": "saltar", "voy al": "ir", "ayuda a las": "ayudar", "enseña en": "enseñar",
+    "aprende en": "aprender", "me baño en": "baño", "me visto en": "vestirse", "me acuesto en": "acostarse",
+    "aprende a": "aprender", "nubes en": "nube", "juego con": "jugar", "ayudo a": "ayudar", "saludo a": "saludar",
+    "respeto a las": "respetar", "escucho al": "escuchar", "hablo con": "hablar", "pago con": "pagar",
+    "juega con": "jugar", "viaja en": "viajar", "llega a": "llegar", "soy feliz con": "feliz",
+    "la escuela": "escuela", "el parque": "parque", "mi cama": "cama", "el cuaderno": "cuaderno",
+    "una casa": "casa", "un dibujo": "dibujo", "la televisión": "televisión", "la casa": "casa",
+    "la oficina": "oficina", "el coche": "coche", "el periódico": "periódico", "el cielo": "cielo",
+    "el agua": "agua", "la granja": "granja", "el campo": "campo", "el lago": "lago", "el zoológico": "zoológico",
+    "la ciudad": "ciudad", "la ducha": "ducha", "los dientes": "dientes", "las manos": "mano",
+    "la mañana": "mañana", "la noche": "noche", "la tarea": "deberes", "un libro": "libro",
+    "mis amigos": "amigos", "mis juguetes": "juguete", "mi amigo": "amigo", "mi maestro": "maestro",
+    "mi familia": "familia", "el supermercado": "supermercado", "una mochila": "mochila",
+    "la puerta": "puerta", "la ventana": "ventana", "las escaleras": "escaleras", "la pelota": "pelota",
+    "una canción": "canción", "la estación": "estación", "el mar": "mar"
+};
+
+function obtenerPalabraLimpia(palabra) {
+    let limpia = palabra.toLowerCase().trim();
+    if (limpia === "." || limpia === "") return "Fin";
+    if (mapeoPalabrasGlobal[limpia]) limpia = mapeoPalabrasGlobal[limpia];
+    limpia = limpia.replace(/^(el|la|los|las|mi|su|sus|un|una|unos|unas)\s+/g, "").trim();
+    return limpia.charAt(0).toUpperCase() + limpia.slice(1);
+}
+
+/* FUNCIÓN QUE ENVÍA LA PALABRA SELECCIONADA AL AVATAR API EN TIEMPO REAL */
+function enviarTextoAIntérpreteAPI(textoPalabra) {
+    const palabraLimpia = obtenerPalabraLimpia(textoPalabra);
+    if (palabraLimpia === "Fin") return;
+
+    try {
+        // Buscamos el elemento interno del widget de VLibras y forzamos la traducción de la glosa
+        if (window.lsvWidget && typeof window.lsvWidget.translate === 'function') {
+            window.lsvWidget.translate(palabraLimpia);
+        } else {
+            // Fallback: Si el plugin no se ha cargado por completo, simula el evento sobre el texto
+            const elementoInvis = document.createElement('div');
+            elementoInvis.textContent = palabraLimpia;
+            elementoInvis.setAttribute('vw-text', 'true');
+            document.body.appendChild(elementoInvis);
+            
+            const eventoClick = new MouseEvent('click', { bubbles: true, cancelable: true });
+            elementoInvis.dispatchEvent(eventoClick);
+            setTimeout(() => elementoInvis.remove(), 500);
+        }
+    } catch (err) {
+        console.warn("La API del intérprete 3D está inicializándose...", err);
     }
-];
+}
 
-/* CONTROL DE USUARIO & AUTENTICACIÓN HÍBRIDA */
+/* AUTENTICACIÓN HÍBRIDA */
 async function inicializarAutenticacionYEstilos() {
   const cedulaInstitucional = localStorage.getItem("user_cedula");
 
@@ -221,7 +371,7 @@ async function inicializarAutenticacionYEstilos() {
     cardJuego.className = "bg-white rounded-3xl shadow-2xl p-6 border-4 border-blue-300 transition-all duration-300";
     titleJuego.className = "text-xl sm:text-3xl font-extrabold text-blue-600 mb-2";
     bgPregunta.className = "bg-blue-100 rounded-2xl py-4 px-6 mb-8 inline-block shadow-sm transition-all duration-300";
-    videoCam.className = "rounded-2xl border-4 border-blue-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black transition-all duration-300";
+    videoCam.className = "rounded-2xl border-4 border-blue-400 shadow-2xl w-28 h-24 sm:w-36 sm:h-28 md:w-44 md:h-32 object-cover bg-black";
 
     try {
       const { data: usuario, error } = await supabase
@@ -258,50 +408,78 @@ async function inicializarAutenticacionYEstilos() {
   }
 }
 
-/* EXTRAER DESDE LA API DE ARASAAC */
+/* EXTRAER DESDE LA API DE ARASAAC WITH FALLBACKS */
 async function buscarImagenEnArasaac(palabra) {
+    let queryLimpio = palabra.toLowerCase().trim();
+    if (queryLimpio === "." || queryLimpio === "") {
+        return "https://static.arasaac.org/pictograms/7397/7397_300.png";
+    }
+
+    if (mapeoPalabrasGlobal[queryLimpio]) {
+        queryLimpio = mapeoPalabrasGlobal[queryLimpio];
+    } else {
+        queryLimpio = queryLimpio
+            .replace(/^(el|la|los|las|mi|su|sus|un|una|unos|unas)\s+/g, "")
+            .replace(/\s+(en|con|de|a|el|la|los|las|su|sus|un|una)$/g, "")
+            .trim();
+    }
+
+    if (queryLimpio === "manos") queryLimpio = "mano";
+    if (queryLimpio === "dientes") queryLimpio = "diente";
+    if (queryLimpio === "huevos") queryLimpio = "huevo";
+    if (queryLimpio === "personas") queryLimpio = "persona";
+
+    let urlEncontrada = await consultarAPI(queryLimpio);
+    if (urlEncontrada) return urlEncontrada;
+
+    if (queryLimpio.endsWith("e")) { 
+        urlEncontrada = await consultarAPI(queryLimpio.slice(0, -1) + "ir");
+        if (urlEncontrada) return urlEncontrada;
+        urlEncontrada = await consultarAPI(queryLimpio.slice(0, -1) + "er");
+        if (urlEncontrada) return urlEncontrada;
+    } 
+    else if (queryLimpio.endsWith("a")) { 
+        urlEncontrada = await consultarAPI(queryLimpio + "r");
+        if (urlEncontrada) return urlEncontrada;
+    }
+
+    const fragmentos = queryLimpio.split(" ");
+    if (fragmentos.length > 1) {
+        urlEncontrada = await consultarAPI(fragmentos[0]);
+        if (urlEncontrada) return urlEncontrada;
+    }
+
+    return "https://via.placeholder.com/150?text=" + encodeURIComponent(palabra);
+}
+
+async function consultarAPI(termino) {
     try {
-        const res = await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(palabra.toLowerCase())}`);
+        const res = await fetch(`https://api.arasaac.org/api/pictograms/es/search/${encodeURIComponent(termino)}`);
         const data = await res.json();
         if (data && data.length > 0) {
             return `https://static.arasaac.org/pictograms/${data[0]._id}/${data[0]._id}_300.png`;
         }
     } catch (e) { console.error(e); }
-    return "https://via.placeholder.com/150?text=Error";
+    return null;
 }
 
-/* LOGOUT UNIFICADO */
-const cerrarSesion = async () => {
-  localStorage.removeItem("user_cedula");
-  await supabase.auth.signOut();
-  location.href='/pages/Login/login.html';
-};
-cerrarBtn.onclick = cerrarSesion;
-cerrarBtnMobile.onclick = cerrarSesion;
-menuBtn.onclick = () => {
-  mobileMenu.classList.toggle('hidden');
-  mobileMenu.classList.toggle('flex');
-};
-
-/* OPERATIVA DEL PUNTERO */
+/* PUNTERO FACIAL */
 btnPuntero.onclick = () => {
   punteroActivo = !punteroActivo;
   if(punteroActivo){
     cursorVirtual.style.display = "block";
     videoCam.parentElement.style.display = "block";
     btnPuntero.querySelector('span').textContent = "Desactivar Puntero";
-    btnPuntero.className = "bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-2xl text-white font-bold shadow-md transition-all flex items-center gap-2 text-lg";
+    btnPuntero.className = "bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-2xl text-white font-bold shadow-md flex items-center gap-2 text-lg";
   }else{
     cursorVirtual.style.display = "none";
     videoCam.parentElement.style.display = "none";
     btnPuntero.querySelector('span').textContent = "Activar Puntero";
-    btnPuntero.className = "bg-green-500 hover:bg-green-600 px-6 py-3 rounded-2xl text-white font-bold shadow-md transition-all flex items-center gap-2 text-lg";
+    btnPuntero.className = "bg-green-500 hover:bg-green-600 px-6 py-3 rounded-2xl text-white font-bold shadow-md flex items-center gap-2 text-lg";
   }
 };
 
-/* =========================================
-   🎮 LÓGICA DEL JUEGO
-========================================= */
+/* OPERATIVA DEL JUEGO */
 btnIniciarJuego.onclick = () => {
     juegoInicioDiv.classList.add('hidden');
     juegoPantallaDiv.classList.remove('hidden');
@@ -312,72 +490,67 @@ btnIniciarJuego.onclick = () => {
 async function generarNuevaRondaOracion() {
     pasoFraseActual = 0;
     juegoFeedbackDiv.textContent = "";
-    juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8";
-    juegoOpcionesDiv.innerHTML = "<p class='col-span-full py-4 text-purple-600 font-bold animate-pulse text-lg'>Buscando vocabulario en ARASAAC...</p>";
+    juegoFeedbackDiv.className = "text-2xl font-bold h-8";
+    juegoOpcionesDiv.innerHTML = "<p class='col-span-full py-4 text-purple-600 font-bold animate-pulse text-lg'>Buscando vocabulario estructurado en ARASAAC...</p>";
 
-    slotSujeto.textContent = "Sujeto"; slotSujeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
-    slotAccion.textContent = "Acción"; slotAccion.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
-    slotObjeto.textContent = "Objeto"; slotObjeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner";
+    slotSujeto.textContent = "Inicio"; slotSujeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center";
+    slotAccion.textContent = "Acción / Verbo"; slotAccion.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center";
+    slotObjeto.textContent = "Complemento"; slotObjeto.className = "w-full bg-white rounded-2xl border-2 border-gray-200 aspect-square flex items-center justify-center p-2 text-xs font-bold text-gray-400 shadow-inner text-center";
 
-    const contextoElegido = contextosOraciones[Math.floor(Math.random() * contextosOraciones.length)];
-    const objSujeto = poolSujetos[Math.floor(Math.random() * poolSujetos.length)];
-    const palAccion = contextoElegido.acciones[Math.floor(Math.random() * contextoElegido.acciones.length)];
-    const objObjeto = contextoElegido.objetos[Math.floor(Math.random() * contextoElegido.objetos.length)];
+    const oracionElegida = bancoOraciones[Math.floor(Math.random() * bancoOraciones.length)];
+    
+    const poolFiltrado = bancoOraciones.filter(o => o.b1 !== oracionElegida.b1);
+    const distractor1 = poolFiltrado[Math.floor(Math.random() * poolFiltrado.length)];
+    const distractor2 = poolFiltrado[(Math.floor(Math.random() * poolFiltrado.length)) % poolFiltrado.length];
 
-    const cSujeto = objSujeto.genero === "M" ? "El" : "La";
-    const cObjeto = objObjeto.genero === "M" ? "un" : "una";
-
-    const [imgSujeto, imgAccion, imgObjeto] = await Promise.all([
-        buscarImagenEnArasaac(objSujeto.palabra),
-        buscarImagenEnArasaac(palAccion),
-        buscarImagenEnArasaac(objObjeto.palabra)
+    const [imgB1, imgB2, imgB3, imgDB1, imgDB2, imgDB3] = await Promise.all([
+        buscarImagenEnArasaac(oracionElegida.b1),
+        buscarImagenEnArasaac(oracionElegida.b2),
+        buscarImagenEnArasaac(oracionElegida.b3),
+        buscarImagenEnArasaac(distractor1.b1),
+        buscarImagenEnArasaac(distractor2.b2),
+        buscarImagenEnArasaac(distractor1.b3)
     ]);
 
+    let complementoString = oracionElegida.b3 === "." ? "" : " " + oracionElegida.b3;
     datosRondaActual = {
-        sujeto: { palabra: objSujeto.palabra, img: imgSujeto },
-        accion: { palabra: palAccion, img: imgAccion },
-        objeto: { palabra: objObjeto.palabra, img: imgObjeto },
-        conectorSujeto: cSujeto,
-        conectorObjeto: cObjeto,
-        fraseLectura: `${cSujeto} ${objSujeto.palabra.toLowerCase()} ${palAccion.toLowerCase()} ${cObjeto} ${objObjeto.palabra.toLowerCase()}`
+        bloque1: { palabra: oracionElegida.b1, img: imgB1 },
+        bloque2: { palabra: oracionElegida.b2, img: imgB2 },
+        bloque3: { palabra: oracionElegida.b3, img: imgB3 },
+        fraseCompleta: `${oracionElegida.b1} ${oracionElegida.b2}${complementoString}.`
     };
 
-    conector1Span.textContent = cSujeto.toUpperCase();
-    conector2Span.textContent = cObjeto.toUpperCase();
-    juegoPreguntaSpan.textContent = datosRondaActual.fraseLectura.toUpperCase();
+    labelBloque1.textContent = obtenerPalabraLimpia(oracionElegida.b1).toUpperCase();
+    labelBloque2.textContent = obtenerPalabraLimpia(oracionElegida.b2).toUpperCase();
+    labelBloque3.textContent = obtenerPalabraLimpia(oracionElegida.b3).toUpperCase();
+    juegoPreguntaSpan.textContent = datosRondaActual.fraseCompleta.toUpperCase();
+
+    // El avatar 3D gesticula la primera palabra clave al iniciar
+    enviarTextoAIntérpreteAPI(oracionElegida.b1);
 
     speechSynthesis.cancel();
-    speechSynthesis.speak(new SpeechSynthesisUtterance(`Vamos a formar la frase: ${datosRondaActual.fraseLectura}`));
+    speechSynthesis.speak(new SpeechSynthesisUtterance(`Vamos a formar la frase: ${datosRondaActual.fraseCompleta}`));
 
-    const distSujeto = poolSujetos.filter(s => s.palabra !== objSujeto.palabra).sort(() => 0.5 - Math.random())[0];
-    const contextoAlternativo = contextosOraciones.filter(c => c !== contextoElegido)[0] || contextosOraciones[0];
-    const distAccion = contextoAlternativo.acciones[0];
-    const distObjeto = contextoAlternativo.objetos[0];
-
-    const [imgDSujeto, imgDAccion, imgDObjeto] = await Promise.all([
-        buscarImagenEnArasaac(distSujeto.palabra),
-        buscarImagenEnArasaac(distAccion),
-        buscarImagenEnArasaac(distObjeto.palabra)
-    ]);
-
-    const poolMezclado = [
-        { palabra: objSujeto.palabra, img: imgSujeto, tipo: 'sujeto' },
-        { palabra: palAccion, img: imgAccion, tipo: 'accion' },
-        { palabra: objObjeto.palabra, img: imgObjeto, tipo: 'objeto' },
-        { palabra: distSujeto.palabra, img: imgDSujeto, tipo: 'sujeto' },
-        { palabra: distAccion, img: imgDAccion, tipo: 'accion' },
-        { palabra: distObjeto.palabra, img: imgDObjeto, tipo: 'objeto' }
+    const opcionesMezcladas = [
+        { palabra: oracionElegida.b1, img: imgB1, paso: 0, tipo: "b1" },
+        { palabra: oracionElegida.b2, img: imgB2, paso: 1, tipo: "b2" },
+        { palabra: oracionElegida.b3, img: imgB3, paso: 2, tipo: "b3" },
+        { palabra: distractor1.b1, img: imgDB1, paso: 0, tipo: "b1" },
+        { palabra: distractor2.b2, img: imgDB2, paso: 1, tipo: "b2" },
+        { palabra: distractor1.b3, img: imgDB3, paso: 2, tipo: "b3" }
     ].sort(() => 0.5 - Math.random());
 
     juegoOpcionesDiv.innerHTML = "";
     const claseBordeCard = isInstitucional ? 'border-blue-200' : 'border-purple-200';
 
-    poolMezclado.forEach(item => {
+    opcionesMezcladas.forEach(item => {
+        const textoMostrarTarjeta = obtenerPalabraLimpia(item.palabra);
+
         const card = document.createElement('div');
-        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-3 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[140px] mx-auto`;
+        card.className = `bg-white rounded-3xl shadow-xl hover:scale-105 border-4 ${claseBordeCard} p-3 cursor-pointer transition-all flex flex-col items-center justify-center w-full aspect-square max-w-[140px] mx-auto text-center`;
         card.innerHTML = `
-            <img src="${item.img}" data-palabra="${item.palabra}" class="w-[75%] h-[75%] object-contain pictograma-img">
-            <span class="text-xs font-black text-gray-600 mt-1">${item.palabra}</span>
+            <img src="${item.img}" data-palabra="${item.palabra}" class="w-[70%] h-[70%] object-contain pictograma-img">
+            <span class="text-[12px] font-black text-gray-600 mt-1 leading-tight break-words max-w-full">${textoMostrarTarjeta}</span>
         `;
         
         card.onclick = () => verificarRespuestaPaso(item, card);
@@ -390,138 +563,109 @@ function verificarRespuestaPaso(itemSeleccionado, elementoCard) {
     speechSynthesis.cancel();
 
     let esCorrecto = false;
+    const palabraLimpiaMostrar = obtenerPalabraLimpia(itemSeleccionado.palabra);
 
-    if (pasoFraseActual === 0 && itemSeleccionado.palabra === datosRondaActual.sujeto.palabra) {
+    if (pasoFraseActual === 0 && itemSeleccionado.palabra === datosRondaActual.bloque1.palabra && itemSeleccionado.paso === 0) {
         esCorrecto = true;
-        slotSujeto.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
-        slotSujeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
-    } else if (pasoFraseActual === 1 && itemSeleccionado.palabra === datosRondaActual.accion.palabra) {
+        slotSujeto.innerHTML = `<div class="flex flex-col items-center justify-center p-1"><img src="${itemSeleccionado.img}" class="w-[70%] h-[70%] object-contain animate-fade-in"><span class="text-[11px] font-bold text-gray-700 mt-0.5">${palabraLimpiaMostrar}</span></div>`;
+        slotSujeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center shadow-md";
+        
+        // Ejecutar seña de la siguiente palabra en la API
+        enviarTextoAIntérpreteAPI(datosRondaActual.bloque2.palabra);
+    } else if (pasoFraseActual === 1 && itemSeleccionado.palabra === datosRondaActual.bloque2.palabra && itemSeleccionado.paso === 1) {
         esCorrecto = true;
-        slotAccion.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
-        slotAccion.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
-    } else if (pasoFraseActual === 2 && itemSeleccionado.palabra === datosRondaActual.objeto.palabra) {
+        slotAccion.innerHTML = `<div class="flex flex-col items-center justify-center p-1"><img src="${itemSeleccionado.img}" class="w-[70%] h-[70%] object-contain animate-fade-in"><span class="text-[11px] font-bold text-gray-700 mt-0.5">${palabraLimpiaMostrar}</span></div>`;
+        slotAccion.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center shadow-md";
+        
+        // Ejecutar seña del complemento final en la API
+        enviarTextoAIntérpreteAPI(datosRondaActual.bloque3.palabra);
+    } else if (pasoFraseActual === 2 && itemSeleccionado.palabra === datosRondaActual.bloque3.palabra && itemSeleccionado.paso === 2) {
         esCorrecto = true;
-        slotObjeto.innerHTML = `<img src="${itemSeleccionado.img}" class="w-[85%] h-[85%] object-contain animate-fade-in">`;
-        slotObjeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center p-1 shadow-md";
+        slotObjeto.innerHTML = `<div class="flex flex-col items-center justify-center p-1"><img src="${itemSeleccionado.img}" class="w-[70%] h-[70%] object-contain animate-fade-in"><span class="text-[11px] font-bold text-gray-700 mt-0.5">${palabraLimpiaMostrar}</span></div>`;
+        slotObjeto.className = "w-full bg-white rounded-2xl border-4 border-green-500 aspect-square flex items-center justify-center shadow-md";
     }
 
     if (esCorrecto) {
-        speechSynthesis.speak(new SpeechSynthesisUtterance(itemSeleccionado.palabra));
+        speechSynthesis.speak(new SpeechSynthesisUtterance(palabraLimpiaMostrar));
         elementoCard.classList.add('opacity-30', 'pointer-events-none');
         
-        // 🌟 FIJACIÓN PUNTERO CONGELADO: Reiniciar hover para que busque un nuevo elemento limpio
         ultimoElemento = null; 
         pasoFraseActual++;
 
         if (pasoFraseActual === 3) {
-            aciertos++;
-            rachaActual++;
-            txtAciertos.textContent = aciertos;
-            txtRacha.textContent = rachaActual;
+            aciertos++; rachaActual++;
+            txtAciertos.textContent = aciertos; txtRacha.textContent = rachaActual;
 
             elementoCard.classList.add('animacion-correcto');
             juegoFeedbackDiv.textContent = "🌟 ¡Excelente! Oración completada 🎉";
-            juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-green-500 animate-fade-in";
+            juegoFeedbackDiv.className = "text-2xl font-bold mb-6 text-green-500 animate-fade-in";
             
             setTimeout(() => {
-                speechSynthesis.speak(new SpeechSynthesisUtterance(datosRondaActual.fraseLectura));
+                speechSynthesis.speak(new SpeechSynthesisUtterance(datosRondaActual.fraseCompleta));
+                // El avatar interpreta la frase entera de corrido al ganar la ronda
+                enviarTextoAIntérpreteAPI(datosRondaActual.fraseCompleta);
             }, 600);
 
             juegoActivo = false;
             setTimeout(() => {
-                juegoActivo = true;
-                generarNuevaRondaOracion();
-            }, 3500);
+                juegoActivo = true; generarNuevaRondaOracion();
+            }, 4000);
         }
     } else {
-        rachaActual = 0;
-        txtRacha.textContent = rachaActual;
-
+        rachaActual = 0; txtRacha.textContent = rachaActual;
         elementoCard.classList.add('animacion-incorrecto');
         juegoFeedbackDiv.textContent = "💪 Inténtalo otra vez, ¡sigue el orden de la frase!";
-        juegoFeedbackDiv.className = "text-2xl font-bold mb-6 h-8 text-orange-500 animate-fade-in";
+        juegoFeedbackDiv.className = "text-xl font-bold mb-6 text-orange-500 animate-fade-in";
         speechSynthesis.speak(new SpeechSynthesisUtterance("Inténtalo otra vez"));
 
-        setTimeout(() => {
-            elementoCard.classList.remove('animacion-incorrecto');
-        }, 600);
+        setTimeout(() => { elementoCard.classList.remove('animacion-incorrecto'); }, 600);
     }
 }
 
-/* =========================================
-   CÁMARA + ROSTRO (MEDIAPIPE INTERACTION)
-========================================= */
+/* MEDIAPIPE FACE MESH SETUP */
 const canvasElement = document.getElementById("canvasCam");
 const canvasCtx = canvasElement.getContext("2d");
 const cursorVirtual = document.getElementById("cursorVirtual");
 
-let rostroX = window.innerWidth / 2;
-let rostroY = window.innerHeight / 2;
-let suavizadoX = rostroX;
-let suavizadoY = rostroY;
-
-let ultimoElemento = null;
-let hoverInicio = 0;
-const TIEMPO_HOVER = 1200;
-const TIEMPO_COOLDOWN = 1500; // Reducido para agilizar clics entre diferentes ítems
+let rostroX = window.innerWidth / 2; let rostroY = window.innerHeight / 2;
+let suavizadoX = rostroX; let suavizadoY = rostroY;
+let ultimoElemento = null; let hoverInicio = 0;
+const TIEMPO_HOVER = 1200; const TIEMPO_COOLDOWN = 1500; 
 const cooldownMap = new Map();
 
 const faceMesh = new FaceMesh({
   locateFile: (file)=> `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
 });
-
-faceMesh.setOptions({
-  maxNumFaces: 1,
-  refineLandmarks: true,
-  minDetectionConfidence: 0.6,
-  minTrackingConfidence: 0.6
-});
+faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
 faceMesh.onResults(onResults);
 
 const camera = new Camera(videoCam, {
-  onFrame: async () => {
-    await faceMesh.send({ image: videoCam });
-  },
-  width: 640,
-  height: 480
+  onFrame: async () => { await faceMesh.send({ image: videoCam }); },
+  width: 640, height: 480
 });
 camera.start();
 
 function onResults(results){
-  canvasElement.width = videoCam.videoWidth;
-  canvasElement.height = videoCam.videoHeight;
-
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasElement.width = videoCam.videoWidth; canvasElement.height = videoCam.videoHeight;
+  canvasCtx.save(); canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
   if(results.multiFaceLandmarks.length > 0 && punteroActivo){
     const landmarks = results.multiFaceLandmarks[0];
     const nose = landmarks[1];
+    const x = nose.x * canvasElement.width; const y = nose.y * canvasElement.height;
 
-    const x = nose.x * canvasElement.width;
-    const y = nose.y * canvasElement.height;
-
-    canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00";
-    canvasCtx.lineWidth=4;
+    canvasCtx.strokeStyle = isInstitucional ? "#3b82f6" : "#00ff00"; canvasCtx.lineWidth=4;
     canvasCtx.strokeRect(x-40, y-40, 80, 80);
 
-    rostroX = window.innerWidth - (nose.x * window.innerWidth);
-    rostroY = nose.y * window.innerHeight;
+    rostroX = window.innerWidth - (nose.x * window.innerWidth); rostroY = nose.y * window.innerHeight;
+    suavizadoX += (rostroX - suavizadoX) * 0.15; suavizadoY += (rostroY - suavizadoY) * 0.15;
 
-    suavizadoX += (rostroX - suavizadoX) * 0.15;
-    suavizadoY += (rostroY - suavizadoY) * 0.15;
-
-    cursorVirtual.style.left = `${suavizadoX}px`;
-    cursorVirtual.style.top = `${suavizadoY}px`;
-
+    cursorVirtual.style.left = `${suavizadoX}px`; cursorVirtual.style.top = `${suavizadoY}px`;
     if(isInstitucional) {
-      cursorVirtual.classList.remove("bg-green-500");
-      cursorVirtual.classList.add("bg-blue-500");
+      cursorVirtual.classList.remove("bg-green-500"); cursorVirtual.classList.add("bg-blue-500");
     } else {
-      cursorVirtual.classList.remove("bg-blue-500");
-      cursorVirtual.classList.add("bg-green-500");
+      cursorVirtual.classList.remove("bg-blue-500"); cursorVirtual.classList.add("bg-green-500");
     }
-
     detectarHover();
   }
   canvasCtx.restore();
@@ -530,44 +674,28 @@ function onResults(results){
 function detectarHover(){
   const elemento = document.elementFromPoint(suavizadoX, suavizadoY);
   if(!elemento) return;
-
   const esPictograma = elemento.tagName==="IMG" && elemento.closest("#juego-opciones");
 
-  if(!esPictograma){
-    ultimoElemento=null;
-    return;
-  }
-
+  if(!esPictograma){ ultimoElemento=null; return; }
   if(elemento===ultimoElemento){
     if(Date.now() - hoverInicio > TIEMPO_HOVER){
-      ejecutarClick(elemento);
-      hoverInicio = Date.now() + 999999;
+      ejecutarClick(elemento); hoverInicio = Date.now() + 999999;
     }
   }else{
-    ultimoElemento = elemento;
-    hoverInicio = Date.now();
+    ultimoElemento = elemento; hoverInicio = Date.now();
   }
 }
 
 function ejecutarClick(elemento){
-  const ahora = Date.now();
-  const ultimoClick = cooldownMap.get(elemento) || 0;
-
-  if(ahora - ultimoClick < TIEMPO_COOLDOWN){
-    return;
-  }
-
+  const ahora = Date.now(); const ultimoClick = cooldownMap.get(elemento) || 0;
+  if(ahora - ultimoClick < TIEMPO_COOLDOWN) return;
   cooldownMap.set(elemento, ahora);
-
-  elemento.style.transform="scale(1.25)";
-  elemento.style.transition="0.2s";
+  elemento.style.transform="scale(1.25)"; elemento.style.transition="0.2s";
   setTimeout(()=>{ elemento.style.transform=""; },300);
-
   elemento.click();
 }
 
 inicializarAutenticacionYEstilos();
-
 </script>
 </body>
 </html>
